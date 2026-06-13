@@ -1,0 +1,30 @@
+import { status } from "../../global/system.enums";
+import { MediaItem } from "./officeLocation.dto";
+export declare class EN_OfficeLocation {
+    id: number;
+    infoType: string;
+    officeNumber: string;
+    street: string;
+    landmark: string;
+    city: string;
+    state: string;
+    workingHours: string;
+    country: string;
+    postalCode: string;
+    googleMapLink: string;
+    officePhone: string;
+    officeEmail: string;
+    status: status;
+    media: MediaItem[];
+    slides: any[];
+    googleEmbedLink: string;
+    linkedin: string;
+    facebook: string;
+    instagram: string;
+    youtube: string;
+    whatsapp: string;
+    created_at: Date;
+    updated_at: Date;
+    created_by: number;
+    updated_by: number;
+}
