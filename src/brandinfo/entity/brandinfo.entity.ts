@@ -13,12 +13,36 @@ export class EN_BrandInfo {
   id: number;
 
   @ApiProperty()
-  @Column({ type: "varchar", length: 500, nullable: true, default: null })
+  @Column({ type: "longtext", nullable: true, default: null })
   brand_logo: string;
 
   @ApiProperty()
-  @Column({ type: "varchar", length: 500, nullable: true, default: null })
+  @Column({ type: "longtext", nullable: true, default: null })
   favicon: string;
+
+  @ApiProperty()
+  @Column({ type: "varchar", length: 255, nullable: true, default: null })
+  company_name: string;
+
+  @ApiProperty()
+  @Column({ type: "varchar", length: 500, nullable: true, default: null })
+  tagline: string;
+
+  @ApiProperty()
+  @Column({ type: "varchar", length: 50, nullable: true, default: null })
+  phone: string;
+
+  @ApiProperty()
+  @Column({ type: "varchar", length: 255, nullable: true, default: null })
+  email: string;
+
+  @ApiProperty()
+  @Column({ type: "longtext", nullable: true, default: null })
+  address: string;
+
+  @ApiProperty()
+  @Column({ type: "varchar", length: 100, nullable: true, default: null })
+  gst: string;
 
   @ApiProperty()
   @Column({ type: "longtext", nullable: true, default: null })
@@ -33,8 +57,8 @@ export class EN_BrandInfo {
   meta_keyword: string;
 
   @ApiProperty()
-  @Column({ type: "varchar", length: 500, nullable: true, default: null })
-  og_image_url: string;
+  @Column({ type: "longtext", nullable: true, default: null })
+  og_image: string;
 
   @ApiProperty()
   @Column({ type: "tinyint", default: 1 })
