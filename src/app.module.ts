@@ -25,6 +25,7 @@ import { PlanCategoryModule } from "./plancategory/planCategory.module";
 import { PlanModule } from "./plan/plan.module";
 import { WorkIndustryModule } from "./workIndustry/workIndustry.module";
 import { FundedProjectsModule } from "./fundedProjects/fundedProjects.module";
+import { GalleryModule } from "./gallery/gallery.module";
 
 require("dotenv").config();
 
@@ -107,6 +108,7 @@ require("dotenv").config();
     PlanModule,
     WorkIndustryModule,
     FundedProjectsModule,
+    GalleryModule,
   ],
   controllers: [AppController],
   providers: [AppService],

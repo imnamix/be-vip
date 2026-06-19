@@ -17,6 +17,11 @@ export class ServicesDTO {
   @IsString()
   image?: string;
 
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsString()
+  icon?: string;
+
   @ApiProperty({ required: false, default: "service" })
   @IsOptional()
   @IsString()

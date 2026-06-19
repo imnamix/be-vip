@@ -25,6 +25,10 @@ export class EN_Services {
   image: string;
 
   @ApiProperty()
+  @Column({ type: "varchar", length: 100, nullable: true, default: null })
+  icon: string;
+
+  @ApiProperty()
   @Column({ type: "varchar", length: 50, default: "service" })
   type: string;
 

@@ -34,7 +34,7 @@ export class ServicesService {
       }
 
       const [data, total] = await query
-        .orderBy("service.created_at", "DESC")
+        .orderBy("service.created_at", "ASC")
         .skip(skip)
         .take(take)
         .getManyAndCount();

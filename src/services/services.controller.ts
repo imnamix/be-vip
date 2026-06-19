@@ -8,6 +8,7 @@ import {
   Param,
   Post,
   Put,
+  Query,
 } from "@nestjs/common";
 import { ApiBody, ApiTags } from "@nestjs/swagger";
 import { ServicesDTO } from "./entity/services.dto";
@@ -41,9 +42,13 @@ export class ServicesController {
   }
 
   @Get("getAll")
-  async getAll() {
+  async getAll(
+    @Query("skip") skip: string = "0",
+    @Query("take") take: string = "1000",
+    @Query("search") search: string = "",
+  ) {
     try {
-      const data = await this.servicesService.getAll();
+      const data = await this.servicesService.getAll(+skip, +take, search);
       if (!data.success) {
         throw new HttpException(
           {
