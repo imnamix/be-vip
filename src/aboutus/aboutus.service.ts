@@ -11,7 +11,7 @@ export class AboutUsService {
     private readonly aboutusRepo: Repository<EN_AboutUs>,
   ) {}
 
-  async create(obj: EN_AboutUs) {
+  async create(obj: AboutusDTO) {
     try {
       const newData = this.aboutusRepo.create(obj);
       return await this.aboutusRepo.save(newData);

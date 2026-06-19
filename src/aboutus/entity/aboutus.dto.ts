@@ -32,6 +32,28 @@ export class WhyChooseUsItem {
   icon: string;
 }
 
+export class SlideItem {
+  @ApiProperty()
+  title: string;
+
+  @ApiProperty()
+  description: string;
+
+  @ApiProperty({ required: false })
+  image?: string;
+}
+
+export class StatisticItem {
+  @ApiProperty()
+  key: string;
+
+  @ApiProperty()
+  value: string;
+
+  @ApiProperty({ required: false })
+  icon?: string;
+}
+
 export class AboutusDTO {
   id: number;
 
@@ -70,6 +92,33 @@ export class AboutusDTO {
 
   @ApiProperty({ type: [Achievement] })
   achievements: Achievement[];
+
+  @ApiProperty({ type: [SlideItem] })
+  slides: SlideItem[];
+
+  @ApiProperty({ required: false })
+  homepageAboutUsTitle?: string;
+
+  @ApiProperty({ required: false })
+  homepageAboutUsDescription?: string;
+
+  @ApiProperty({ required: false })
+  homepageAboutUsImage?: string;
+
+  @ApiProperty({ required: false })
+  aboutPageTitle?: string;
+
+  @ApiProperty({ required: false })
+  aboutPageDescription?: string;
+
+  @ApiProperty({ required: false })
+  aboutPageImage?: string;
+
+  @ApiProperty({ required: false })
+  yearsOfExperience?: number;
+
+  @ApiProperty({ type: [StatisticItem] })
+  statistics: StatisticItem[];
 
   @ApiProperty({ enum: achievementType })
   @IsEnum(achievementType)

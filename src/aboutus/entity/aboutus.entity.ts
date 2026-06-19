@@ -7,7 +7,7 @@ import {
   UpdateDateColumn,
 } from "typeorm";
 import { achievementType, status } from "../../global/system.enums";
-import { MediaItem } from "./aboutus.dto";
+import { MediaItem, SlideItem, StatisticItem } from "./aboutus.dto";
 
 @Entity("aboutus")
 export class EN_AboutUs {
@@ -69,6 +69,42 @@ export class EN_AboutUs {
   @ApiProperty()
   @Column({ type: "json", nullable: true, default: null })
   achievements: Achievement[];
+
+  @ApiProperty({ type: [SlideItem] })
+  @Column({ type: "json", nullable: true, default: null })
+  slides: SlideItem[];
+
+  @ApiProperty()
+  @Column({ type: "varchar", length: 500, nullable: true, default: null })
+  homepageAboutUsTitle: string;
+
+  @ApiProperty()
+  @Column({ type: "longtext", nullable: true, default: null })
+  homepageAboutUsDescription: string;
+
+  @ApiProperty()
+  @Column({ type: "varchar", length: 500, nullable: true, default: null })
+  homepageAboutUsImage: string;
+
+  @ApiProperty()
+  @Column({ type: "varchar", length: 500, nullable: true, default: null })
+  aboutPageTitle: string;
+
+  @ApiProperty()
+  @Column({ type: "longtext", nullable: true, default: null })
+  aboutPageDescription: string;
+
+  @ApiProperty()
+  @Column({ type: "varchar", length: 500, nullable: true, default: null })
+  aboutPageImage: string;
+
+  @ApiProperty()
+  @Column({ type: "int", nullable: true, default: null })
+  yearsOfExperience: number;
+
+  @ApiProperty({ type: [StatisticItem] })
+  @Column({ type: "json", nullable: true, default: null })
+  statistics: StatisticItem[];
 
   @ApiProperty()
   @Column({ type: "enum", enum: status, default: status.ACTIVE })
