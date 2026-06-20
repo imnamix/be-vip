@@ -8,28 +8,19 @@ import { SharedModule } from "./shared/shared.module";
 import { LoginModule } from "./login/login.module";
 import { UserModule } from "./user/user.module";
 import { UploadModule } from "./fileUploader/upload.module";
-import { ProjectModule } from "./project/project.module";
-import { OfficeLocationModule } from "./officeLocation/officeLocation.module";
-import { NewsBlogModule } from "./newsAndBlogs/newsBlogs.module";
 import { HomePageModule } from "./homePage/homepage.module";
-import { ClientsModule } from "./clients/clients.module";
 import { CustomerModule } from "./customer/customer.module";
 import { AboutUsModule } from "./aboutus/aboutus.module";
 import { EnquiryModule } from "./enquiry/enquiry.module";
 import { EventsModule } from "./events/events.module";
-import { ProjectLocationModule } from "./projectLocation/projectLocation.module";
 import { BrandInfoModule } from "./brandinfo/brandinfo.module";
 import { ServicesModule } from "./services/services.module";
-import { ContactInfoModule } from "./contactInfo/contact-info.module";
-import { PlanCategoryModule } from "./plancategory/planCategory.module";
-import { PlanModule } from "./plan/plan.module";
-import { WorkIndustryModule } from "./workIndustry/workIndustry.module";
-import { FundedProjectsModule } from "./fundedProjects/fundedProjects.module";
 import { GalleryModule } from "./gallery/gallery.module";
 import { TestimonialsModule } from "./testimonials/testimonials.module";
 import { VideoTestimonialsModule } from "./videoTestimonials/video-testimonials.module";
 import { FaqsModule } from "./faqs/faqs.module";
 import { ServicePageModule } from "./servicePage/service-page.module";
+import { ContactModule } from "./contact/contact.module";
 
 require("dotenv").config();
 
@@ -95,28 +86,19 @@ require("dotenv").config();
     LoginModule,
     UserModule,
     UploadModule,
-    ProjectModule,
-    ProjectLocationModule,
-    OfficeLocationModule,
-    NewsBlogModule,
     HomePageModule,
-    ClientsModule,
     CustomerModule,
     AboutUsModule,
     EnquiryModule,
     EventsModule,
     BrandInfoModule,
     ServicesModule,
-    ContactInfoModule,
-    PlanCategoryModule,
-    PlanModule,
-    WorkIndustryModule,
-    FundedProjectsModule,
     GalleryModule,
     TestimonialsModule,
     VideoTestimonialsModule,
     FaqsModule,
     ServicePageModule,
+    ContactModule,
   ],
   controllers: [AppController],
   providers: [AppService],
