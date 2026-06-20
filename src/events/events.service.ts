@@ -37,20 +37,15 @@ export class EventsService {
         }
       }
 
-      let whereCondition: any = null;
-      if (status === "active") {
-        whereCondition = search
-          ? [{ title: Like(`%${search}%`), status: 1 }]
-          : { status: 1 };
-      } else {
-        whereCondition = search ? [{ title: Like(`%${search}%`) }] : null;
-      }
+      const whereCondition: any = {};
+      if (search) whereCondition.title = Like(`%${search}%`);
+      if (status && status !== "All") whereCondition.eventStatus = status;
 
       const [data, total] = await this.eventsRepo.findAndCount({
         take: pageSize,
         skip: skip,
         order: { created_at: "DESC" },
-        where: whereCondition,
+        where: Object.keys(whereCondition).length ? whereCondition : undefined,
       });
       return { data: data, count: total };
     } catch (error) {

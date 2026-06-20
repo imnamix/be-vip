@@ -30,7 +30,22 @@ export class EventsDTO {
   eventTime: string;
 
   @ApiProperty()
+  endTime: string;
+
+  @ApiProperty()
   location: string;
+
+  @ApiProperty()
+  seats: number;
+
+  @ApiProperty()
+  fees: string;
+
+  @ApiProperty()
+  eventStatus: string;
+
+  @ApiProperty()
+  schedules: { time: string; title: string }[];
 
   @ApiProperty({ enum: eventType })
   @IsEnum(eventType)

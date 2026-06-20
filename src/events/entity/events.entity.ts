@@ -39,8 +39,28 @@ export class EN_Events {
   eventTime: string;
 
   @ApiProperty()
+  @Column({ type: "time", nullable: true, default: null })
+  endTime: string;
+
+  @ApiProperty()
   @Column({ type: "varchar", length: 255, nullable: true, default: null })
   location: string;
+
+  @ApiProperty()
+  @Column({ type: "int", nullable: true, default: null })
+  seats: number;
+
+  @ApiProperty()
+  @Column({ type: "varchar", length: 255, nullable: true, default: null })
+  fees: string;
+
+  @ApiProperty()
+  @Column({ type: "varchar", length: 50, nullable: true, default: "Draft" })
+  eventStatus: string;
+
+  @ApiProperty()
+  @Column({ type: "json", nullable: true, default: null })
+  schedules: { time: string; title: string }[];
 
   @ApiProperty()
   @Column({

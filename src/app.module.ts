@@ -21,6 +21,7 @@ import { VideoTestimonialsModule } from "./videoTestimonials/video-testimonials.
 import { FaqsModule } from "./faqs/faqs.module";
 import { ServicePageModule } from "./servicePage/service-page.module";
 import { ContactModule } from "./contact/contact.module";
+import { EventBannerModule } from "./eventBanner/event-banner.module";
 
 require("dotenv").config();
 
@@ -99,6 +100,7 @@ require("dotenv").config();
     FaqsModule,
     ServicePageModule,
     ContactModule,
+    EventBannerModule,
   ],
   controllers: [AppController],
   providers: [AppService],
