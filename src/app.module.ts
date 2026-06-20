@@ -26,6 +26,10 @@ import { PlanModule } from "./plan/plan.module";
 import { WorkIndustryModule } from "./workIndustry/workIndustry.module";
 import { FundedProjectsModule } from "./fundedProjects/fundedProjects.module";
 import { GalleryModule } from "./gallery/gallery.module";
+import { TestimonialsModule } from "./testimonials/testimonials.module";
+import { VideoTestimonialsModule } from "./videoTestimonials/video-testimonials.module";
+import { FaqsModule } from "./faqs/faqs.module";
+import { ServicePageModule } from "./servicePage/service-page.module";
 
 require("dotenv").config();
 
@@ -109,6 +113,10 @@ require("dotenv").config();
     WorkIndustryModule,
     FundedProjectsModule,
     GalleryModule,
+    TestimonialsModule,
+    VideoTestimonialsModule,
+    FaqsModule,
+    ServicePageModule,
   ],
   controllers: [AppController],
   providers: [AppService],
