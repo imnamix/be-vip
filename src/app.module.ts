@@ -22,6 +22,7 @@ import { FaqsModule } from "./faqs/faqs.module";
 import { ServicePageModule } from "./servicePage/service-page.module";
 import { ContactModule } from "./contact/contact.module";
 import { EventBannerModule } from "./eventBanner/event-banner.module";
+import { VipNumbersModule } from "./vipNumbers/vip-numbers.module";
 
 require("dotenv").config();
 
@@ -101,6 +102,7 @@ require("dotenv").config();
     ServicePageModule,
     ContactModule,
     EventBannerModule,
+    VipNumbersModule,
   ],
   controllers: [AppController],
   providers: [AppService],

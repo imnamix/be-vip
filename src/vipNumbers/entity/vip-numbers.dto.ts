@@ -1,0 +1,35 @@
+import { ApiProperty } from "@nestjs/swagger";
+import { IsOptional, IsString, IsNumber } from "class-validator";
+import { Type } from "class-transformer";
+
+export class VipNumbersDTO {
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsString()
+  icon?: string;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsString()
+  vipNumber?: string;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsString()
+  category?: string;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsString()
+  description?: string;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @Type(() => Number)
+  @IsNumber()
+  price?: number;
+
+  @ApiProperty({ required: false, default: 1 })
+  @IsOptional()
+  status?: number;
+}
