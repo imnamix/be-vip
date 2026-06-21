@@ -33,6 +33,10 @@ export class EN_VipNumber {
   price: number;
 
   @ApiProperty()
+  @Column({ type: "varchar", length: 20, nullable: true, default: null })
+  tag: string;
+
+  @ApiProperty()
   @Column({ type: "tinyint", default: 1 })
   status: number;
 

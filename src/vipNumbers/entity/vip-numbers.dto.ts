@@ -29,6 +29,11 @@ export class VipNumbersDTO {
   @IsNumber()
   price?: number;
 
+  @ApiProperty({ required: false, enum: ['HOT', 'NEW', 'SOLD OUT', ''] })
+  @IsOptional()
+  @IsString()
+  tag?: string;
+
   @ApiProperty({ required: false, default: 1 })
   @IsOptional()
   status?: number;

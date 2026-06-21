@@ -40,7 +40,12 @@ export class TestimonialsService {
         .take(take)
         .getManyAndCount();
 
-      return { success: true, message: "Testimonials fetched successfully.", data, total };
+      const averageRating =
+        data.length > 0
+          ? Math.round((data.reduce((sum, t) => sum + (t.rating ?? 5), 0) / data.length) * 10) / 10
+          : 0;
+
+      return { success: true, message: "Testimonials fetched successfully.", data, total, averageRating };
     } catch (error) {
       return { success: false, message: "Error while fetching testimonials.", error };
     }

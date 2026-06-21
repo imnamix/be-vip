@@ -42,7 +42,7 @@ export class UploadController {
     },
   })
   @UseInterceptors(
-    FilesInterceptor("files", 5, { limits: { fileSize: 450 * 1024 * 1024 } })
+    FilesInterceptor("files", 5, { limits: { fileSize: 500 * 1024 * 1024 } }) // 500 MB — supports video uploads
   )
   async uploadS3(@UploadedFiles() files: Express.Multer.File[], @Req() req) {
     try {

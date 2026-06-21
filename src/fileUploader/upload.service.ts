@@ -49,54 +49,87 @@ export class UploadService {
       throw new Error("Bucket name is not defined in environment variables");
     }
   }
+  // SVG / GIF / ICO cannot be meaningfully re-encoded by sharp — skip those.
+  private readonly NON_OPTIMIZABLE_TYPES = new Set([
+    "image/svg+xml",
+    "image/gif",
+    "image/x-icon",
+    "image/vnd.microsoft.icon",
+  ]);
+
   async uploadToWasabi(file: Express.Multer.File, entityName?: string) {
     const randomName = `${Date.now()}-${Math.random().toString(36).substring(2)}`;
     const folderPath = entityName ? `gallery/${entityName}/` : "gallery/";
-    const fileExtension = extname(file.originalname);
-    const fileNameWithoutExt = randomName;
-    const fullPath = `${folderPath}${fileNameWithoutExt}${fileExtension}`;
-    const thumbnailPath = `${folderPath}thumbnails/${fileNameWithoutExt}_thumb${fileExtension}`;
+
+    const isOptimizable =
+      file.mimetype.startsWith("image/") &&
+      !this.NON_OPTIMIZABLE_TYPES.has(file.mimetype);
+
+    // ── Step 1: optimise the main image ──────────────────────────────────────
+    let uploadBuffer: Buffer = file.buffer;
+    let contentType: string = file.mimetype;
+    let fileExt: string = extname(file.originalname);
+
+    if (isOptimizable) {
+      try {
+        uploadBuffer = await sharp(file.buffer)
+          .rotate() // auto-correct EXIF orientation
+          .resize(1920, 1920, { fit: "inside", withoutEnlargement: true })
+          .webp({ quality: 80, effort: 4 })
+          .toBuffer();
+        fileExt = ".webp";
+        contentType = "image/webp";
+      } catch (err) {
+        console.error("Sharp optimisation failed, uploading original:", err);
+        // fall back to original buffer / mime
+      }
+    }
+
+    const fullPath = `${folderPath}${randomName}${fileExt}`;
+    const thumbnailPath = `${folderPath}thumbnails/${randomName}_thumb.webp`;
 
     try {
-      let uploadPromises: Promise<any>[] = [];
-      let thumbnailUrl = null;
+      const uploadPromises: Promise<any>[] = [];
 
-      // Upload original file
-      const params: AWS.S3.PutObjectRequest = {
-        Bucket: this.bucketName,
-        Key: fullPath,
-        Body: file.buffer,
-        ContentType: file.mimetype,
-      };
-      uploadPromises.push(this.s3.upload(params).promise());
+      // ── Step 2: upload main (optimised) file ─────────────────────────────
+      uploadPromises.push(
+        this.s3
+          .upload({
+            Bucket: this.bucketName,
+            Key: fullPath,
+            Body: uploadBuffer,
+            ContentType: contentType,
+          })
+          .promise(),
+      );
 
-      // Generate and upload thumbnail for images only
-      if (file.mimetype.startsWith("image/")) {
+      // ── Step 3: generate & upload WebP thumbnail ──────────────────────────
+      if (isOptimizable) {
         try {
-          const thumbnailBuffer = await sharp(file.buffer)
-            .resize(400, 300, {
-              fit: "cover",
-              position: "center",
-            })
+          const thumbBuffer = await sharp(file.buffer) // always from original buffer
+            .rotate()
+            .resize(400, 300, { fit: "cover", position: "center" })
+            .webp({ quality: 75, effort: 3 })
             .toBuffer();
 
-          const thumbnailParams: AWS.S3.PutObjectRequest = {
-            Bucket: this.bucketName,
-            Key: thumbnailPath,
-            Body: thumbnailBuffer,
-            ContentType: file.mimetype,
-          };
-          uploadPromises.push(this.s3.upload(thumbnailParams).promise());
-        } catch (error) {
-          console.error("Error generating thumbnail:", error);
-          // Continue upload without thumbnail if generation fails
+          uploadPromises.push(
+            this.s3
+              .upload({
+                Bucket: this.bucketName,
+                Key: thumbnailPath,
+                Body: thumbBuffer,
+                ContentType: "image/webp",
+              })
+              .promise(),
+          );
+        } catch (err) {
+          console.error("Thumbnail generation failed:", err);
         }
       }
 
       const results = await Promise.all(uploadPromises);
-      const originalResult = results[0];
 
-      if (!originalResult) {
+      if (!results[0]) {
         throw new HttpException(
           "File upload failed: No response from Amazon S3",
           HttpStatus.INTERNAL_SERVER_ERROR,
@@ -104,17 +137,16 @@ export class UploadService {
       }
 
       const access_url = `${this.cdn_key}/${fullPath}`;
-      if (results.length > 1) {
-        thumbnailUrl = `${this.cdn_key}/${thumbnailPath}`;
-      }
+      const thumbnail_url =
+        results.length > 1 ? `${this.cdn_key}/${thumbnailPath}` : null;
 
       return {
         originalName: file.originalname,
         filename: fullPath,
-        fileType: file.mimetype,
-        size: file.size,
-        access_url: access_url,
-        thumbnail_url: thumbnailUrl,
+        fileType: contentType,
+        size: uploadBuffer.length,
+        access_url,
+        thumbnail_url,
         date: new Date(),
       };
     } catch (error) {
