@@ -63,12 +63,8 @@ export class EN_Events {
   schedules: { time: string; title: string }[];
 
   @ApiProperty()
-  @Column({
-    type: "enum",
-    enum: eventType,
-    default: eventType.SEMINAR,
-  })
-  eventType: eventType;
+  @Column({ type: "varchar", length: 100, nullable: true, default: null })
+  eventType: string;
 
   @ApiProperty()
   @Column({ type: "json", nullable: true, default: null })

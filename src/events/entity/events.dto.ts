@@ -47,9 +47,8 @@ export class EventsDTO {
   @ApiProperty()
   schedules: { time: string; title: string }[];
 
-  @ApiProperty({ enum: eventType })
-  @IsEnum(eventType)
-  eventType: eventType;
+  @ApiProperty()
+  eventType: string;
 
   @ApiProperty({ type: [MediaItem] })
   mainImage: MediaItem[];
