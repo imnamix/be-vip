@@ -7,11 +7,11 @@ import { RoleGuard } from './guards/role.gaurd';
 @Module({
   imports: [
     PassportModule.register({ defaultStrategy: 'jwt' }),
-    JwtModule.register({
-      secret: 'secretKey',
-      signOptions: {
-        expiresIn: 3600,
-      },
+    JwtModule.registerAsync({
+      useFactory: () => ({
+        secret: process.env.SECRET,
+        signOptions: { expiresIn: '7d' },
+      }),
     }),
   ],
   controllers: [],

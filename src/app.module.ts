@@ -5,6 +5,8 @@ import { MailerModule } from "@nestjs-modules/mailer";
 import { COMMUNICATION_MAIL_CONSTANT } from "./global/global.constant";
 import { AppController } from "./app.controller";
 import { SharedModule } from "./shared/shared.module";
+import { AuthModule } from "./auth/auth.module";
+import { SeedModule } from "./seed/seed.module";
 import { LoginModule } from "./login/login.module";
 import { UserModule } from "./user/user.module";
 import { UploadModule } from "./fileUploader/upload.module";
@@ -86,6 +88,8 @@ require("dotenv").config();
       },
     }),
 
+    AuthModule,
+    SeedModule,
     SharedModule,
     LoginModule,
     UserModule,

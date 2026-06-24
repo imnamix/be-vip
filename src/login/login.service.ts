@@ -66,7 +66,7 @@ export class LoginService {
         },
       };
     } catch (error) {
-      return error;
+      throw error;
     }
   }
 
@@ -217,13 +217,8 @@ export class LoginService {
       }
 
       const hashPassword = await bcrypt.hash(newPassword, 10);
-      const newPayload = {
-        email: email,
-        password: hashPassword,
-        ...user,
-      };
 
-      await this.userRepo.save(newPayload);
+      await this.userRepo.update({ email }, { password: hashPassword });
 
       return {
         status: "success",
