@@ -23,6 +23,8 @@ import { ServicePageModule } from "./servicePage/service-page.module";
 import { ContactModule } from "./contact/contact.module";
 import { EventBannerModule } from "./eventBanner/event-banner.module";
 import { VipNumbersModule } from "./vipNumbers/vip-numbers.module";
+import { GeneralInquiryModule } from "./generalInquiry/general-inquiry.module";
+import { WhatsappSettingsModule } from "./whatsappSettings/whatsapp-settings.module";
 
 require("dotenv").config();
 
@@ -103,6 +105,8 @@ require("dotenv").config();
     ContactModule,
     EventBannerModule,
     VipNumbersModule,
+    GeneralInquiryModule,
+    WhatsappSettingsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

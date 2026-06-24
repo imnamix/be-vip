@@ -5,6 +5,8 @@ import {
   Get,
   HttpException,
   HttpStatus,
+  Param,
+  Patch,
   Post,
   Query,
 } from "@nestjs/common";
@@ -43,16 +45,19 @@ export class EnquiryController {
   @ApiQuery({ name: "page", required: false, type: Number })
   @ApiQuery({ name: "limit", required: false, type: Number })
   @ApiQuery({ name: "search", required: false, type: String })
+  @ApiQuery({ name: "status", required: false, type: String })
   async getAllEnquiry(
     @Query("page") page: number = 1,
-    @Query("limit") limit: number = 1000,
-    @Query("search") search: string
+    @Query("limit") limit: number = 10,
+    @Query("search") search: string,
+    @Query("status") status: string
   ) {
     try {
       const allData = await this.enquiryService.getAllEnquiry({
         page,
         limit,
         search,
+        status,
       });
 
       return {
@@ -68,6 +73,45 @@ export class EnquiryController {
           message: "Error While fetching Enquires",
           error: error,
         },
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
+
+  @Get("statusCounts")
+  async getStatusCounts() {
+    try {
+      return await this.enquiryService.getStatusCounts();
+    } catch (error) {
+      throw new HttpException(
+        { success: false, message: "Error fetching status counts", error },
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
+
+  @Get(":id")
+  async getById(@Param("id") id: number) {
+    try {
+      const data = await this.enquiryService.getEnquiryById(id);
+      return { success: true, data };
+    } catch (error) {
+      throw new HttpException(
+        { success: false, message: "Error fetching enquiry", error },
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
+
+  @Patch("update/:id")
+  @ApiBody({ type: EnquiryDTO })
+  async update(@Param("id") id: number, @Body() payload: Partial<EnquiryDTO>) {
+    try {
+      const data = await this.enquiryService.updateEnquiry(id, payload);
+      return { success: true, message: "Enquiry updated successfully", data };
+    } catch (error) {
+      throw new HttpException(
+        { success: false, message: "Error updating enquiry", error },
         HttpStatus.INTERNAL_SERVER_ERROR
       );
     }
