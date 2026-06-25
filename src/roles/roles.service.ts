@@ -2,13 +2,16 @@ import { Injectable, HttpException, HttpStatus } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { In, Like, Repository } from "typeorm";
 import { EN_AdminRole } from "./entity/role.entity";
+import { EN_User } from "../user/entity/user.entity";
 import { CreateRoleDTO, UpdateRoleDTO } from "./entity/role.dto";
 
 @Injectable()
 export class RolesService {
   constructor(
     @InjectRepository(EN_AdminRole)
-    private readonly roleRepo: Repository<EN_AdminRole>
+    private readonly roleRepo: Repository<EN_AdminRole>,
+    @InjectRepository(EN_User)
+    private readonly userRepo: Repository<EN_User>,
   ) {}
 
   async create(dto: CreateRoleDTO) {
@@ -90,6 +93,22 @@ export class RolesService {
       if (roles.length === 0) {
         return { success: false, message: "No roles found to delete" };
       }
+
+      // Block deletion if any users are still assigned to these roles
+      const userCount = await this.userRepo
+        .createQueryBuilder("u")
+        .where("u.role_id IN (:...ids)", { ids })
+        .getCount();
+
+      if (userCount > 0) {
+        const roleName = roles[0].name;
+        return {
+          success: false,
+          userCount,
+          message: `"${roleName}" is assigned to ${userCount} user${userCount !== 1 ? "s" : ""}. Remove this role from those users before deleting it.`,
+        };
+      }
+
       await this.roleRepo.remove(roles);
       return { success: true, message: "Role(s) deleted successfully", data: roles };
     } catch (error) {

@@ -9,14 +9,16 @@ import { gender, status } from '../global/system.enums';
 const ALL_TRUE = { read: true, write: true, update: true, delete: true };
 
 const SUPER_ADMIN_PERMISSIONS: Record<string, { read: boolean; write: boolean; update: boolean; delete: boolean }> = {
-  Dashboard:     ALL_TRUE,
-  Users:         ALL_TRUE,
-  Roles:         ALL_TRUE,
-  Content:       ALL_TRUE,
-  Events:        ALL_TRUE,
-  Customers:     ALL_TRUE,
-  Reports:       ALL_TRUE,
-  Notifications: ALL_TRUE,
+  Dashboard:        ALL_TRUE,
+  Inquiry:          ALL_TRUE,
+  'General Inquiry': ALL_TRUE,
+  Events:           ALL_TRUE,
+  'Top VIP Numbers': ALL_TRUE,
+  Content:          ALL_TRUE,
+  Roles:            ALL_TRUE,
+  Users:            ALL_TRUE,
+  Delivery:         ALL_TRUE,
+  Settings:         ALL_TRUE,
 };
 
 @Injectable()

@@ -109,7 +109,7 @@ export class UserService {
 
   async updateUser(id: number, updatedData: UpdateUserDTO) {
     try {
-      const { role, email, phone, ...rest } = updatedData;
+      const { role, email, phone, password, ...rest } = updatedData as any;
       const user = await this.userRepo.findOne({ where: { id } });
       if (!user) {
         throw new HttpException("User not found", HttpStatus.NOT_FOUND);
@@ -133,13 +133,17 @@ export class UserService {
         ? await this.roleRepo.findOne({ where: { id: role } })
         : undefined;
 
-      const newData = {
+      const newData: any = {
         role: existingRole ?? undefined,
-        roleName: (updatedData as any).roleName ?? existingRole?.name ?? undefined,
+        roleName: updatedData.roleName ?? existingRole?.name ?? undefined,
         email,
         phone,
         ...rest,
       };
+
+      if (password) {
+        newData.password = await bcrypt.hash(password, 10);
+      }
 
       this.userRepo.merge(user, newData);
       await this.userRepo.save(user);
