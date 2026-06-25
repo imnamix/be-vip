@@ -9,7 +9,7 @@ import {
 } from "typeorm";
 
 import { ApiProperty } from "@nestjs/swagger";
-import { EN_Role } from "./role.entity";
+import { EN_AdminRole } from "../../roles/entity/role.entity";
 import { gender, status } from "../../global/system.enums";
 
 @Entity("user")
@@ -54,9 +54,17 @@ export class EN_User {
   })
   gender: gender;
 
-  @ManyToOne(() => EN_Role, (role) => role.users)
+  @ManyToOne(() => EN_AdminRole, { nullable: true, eager: false })
   @JoinColumn({ name: "role_id" })
-  role: EN_Role;
+  role: EN_AdminRole;
+
+  @ApiProperty()
+  @Column({ length: 100, nullable: true, default: null })
+  roleName: string;
+
+  @ApiProperty()
+  @Column({ length: 1000, nullable: true, default: null })
+  profilePicture: string;
 
   @ApiProperty()
   @Column({ type: "enum", enum: status, default: status.ACTIVE })

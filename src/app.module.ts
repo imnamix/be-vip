@@ -27,6 +27,8 @@ import { EventBannerModule } from "./eventBanner/event-banner.module";
 import { VipNumbersModule } from "./vipNumbers/vip-numbers.module";
 import { GeneralInquiryModule } from "./generalInquiry/general-inquiry.module";
 import { WhatsappSettingsModule } from "./whatsappSettings/whatsapp-settings.module";
+import { RolesModule } from "./roles/roles.module";
+import { DashboardModule } from "./dashboard/dashboard.module";
 
 require("dotenv").config();
 
@@ -111,6 +113,8 @@ require("dotenv").config();
     VipNumbersModule,
     GeneralInquiryModule,
     WhatsappSettingsModule,
+    RolesModule,
+    DashboardModule,
   ],
   controllers: [AppController],
   providers: [AppService],

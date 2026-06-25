@@ -1,6 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { gender, status, userRoles } from "../../global/system.enums";
-import { IsEnum } from "class-validator";
+import { gender, status } from "../../global/system.enums";
+import { IsEnum, IsOptional, IsNumber } from "class-validator";
 
 export class UserDTO {
   id: number;
@@ -21,9 +21,16 @@ export class UserDTO {
   @IsEnum(gender)
   gender: gender;
 
-  @ApiProperty({ enum: userRoles })
-  @IsEnum(userRoles)
-  role: userRoles;
+  @ApiProperty({ example: 1, required: false, description: "Role ID from admin_role table" })
+  @IsOptional()
+  @IsNumber()
+  role: number;
+
+  @ApiProperty({ example: "Sales Executive", required: false })
+  roleName: string;
+
+  @ApiProperty({ required: false })
+  profilePicture: string;
 
   @ApiProperty({ enum: status })
   @IsEnum(status)

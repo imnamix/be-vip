@@ -118,6 +118,21 @@ export class UserController {
     }
   }
 
+  @Post('change-password/:id')
+  async changePassword(
+    @Param('id') id: number,
+    @Body() body: { currentPassword: string; newPassword: string },
+  ) {
+    try {
+      return await this.service.changePassword(id, body.currentPassword, body.newPassword);
+    } catch (error) {
+      throw new HttpException(
+        { success: false, message: error.message || 'Error changing password' },
+        error.status ?? HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
   @Delete("delete")
   @ApiBody({ type: deleteUserDTO })
   async delete(@Body() userDto: deleteUserDTO) {

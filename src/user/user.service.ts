@@ -4,19 +4,17 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { EN_User } from "./entity/user.entity";
 import { In, Like, Repository } from "typeorm";
 import { UtilityHelper } from "../shared/services/utility.helper";
-import { EN_Role } from "./entity/role.entity";
-import { EN_Permission } from "./entity/permission.entity";
+import { EN_AdminRole } from "../roles/entity/role.entity";
 import * as bcrypt from "bcrypt";
 import { UserDTO } from "./entity/user.dto";
 import { UpdateUserDTO } from "./entity/update.dto";
 import { deleteUserDTO } from "./entity/deleteUser.dto";
+
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(EN_User) private readonly userRepo: Repository<EN_User>,
-    @InjectRepository(EN_Role) private readonly roleRepo: Repository<EN_Role>,
-    @InjectRepository(EN_Permission)
-    private readonly permissionRepo: Repository<EN_Permission>,
+    @InjectRepository(EN_AdminRole) private readonly roleRepo: Repository<EN_AdminRole>,
     private readonly utilityHelper: UtilityHelper
   ) {}
 
@@ -29,61 +27,44 @@ export class UserService {
       }
 
       const existingUser = await this.userRepo.findOne({
-        where: [{ email: email }, { phone: phone }],
+        where: [{ email }, { phone }],
       });
 
       if (existingUser) {
-        return {
-          success: false,
-          message: "User Already Exists",
-        };
+        return { success: false, message: "User Already Exists" };
       }
 
       const hashPassword = await bcrypt.hash(password, 10);
 
-      const existingRole = await this.roleRepo.findOne({
-        where: { role: role },
-        relations: ["permissions"],
-      });
-
-      if (!existingRole) {
-        throw new Error("Role not found");
-      }
+      const existingRole = role
+        ? await this.roleRepo.findOne({ where: { id: role } })
+        : null;
 
       const user = this.userRepo.create({
-        email: email,
+        email,
         password: hashPassword,
-        role: existingRole,
-        phone: phone,
+        role: existingRole ?? undefined,
+        roleName: (rest as any).roleName ?? existingRole?.name ?? null,
+        phone,
         ...rest,
       });
       await this.userRepo.save(user);
+
       const newUser = await this.userRepo.findOne({
-        where: { email: obj.email },
-        relations: ["role", "role.permissions"],
+        where: { email },
+        relations: ["role"],
       });
 
       if (newUser) {
-        return {
-          success: true,
-          message: "User Added Successfully",
-          data: newUser,
-        };
+        return { success: true, message: "User Added Successfully", data: newUser };
       }
-      return {
-        success: false,
-        message: "Error while creating User",
-      };
+      return { success: false, message: "Error while creating User" };
     } catch (error) {
       return error;
     }
   }
 
-  async getAllUsers(pagination: {
-    page: number;
-    limit: number;
-    search: string;
-  }) {
+  async getAllUsers(pagination: { page: number; limit: number; search: string }) {
     try {
       const { page, limit, search } = pagination;
       let pageSize = 1000000;
@@ -97,8 +78,8 @@ export class UserService {
 
       const [data, total] = await this.userRepo.findAndCount({
         take: pageSize,
-        skip: skip,
-        relations: ["role", "role.permissions"],
+        skip,
+        relations: ["role"],
         order: { created_at: "DESC" },
         where: search
           ? [
@@ -109,11 +90,7 @@ export class UserService {
           : null,
       });
 
-      return {
-        count: total,
-        data: data,
-        message: "User List Fetched Successfully",
-      };
+      return { count: total, data, message: "User List Fetched Successfully" };
     } catch (error) {
       return error;
     }
@@ -122,7 +99,7 @@ export class UserService {
   async getUserById(userId: number) {
     const user = await this.userRepo.findOne({
       where: { id: userId },
-      relations: ["role", "role.permissions"],
+      relations: ["role"],
     });
     if (!user) {
       throw new HttpException("User not found", HttpStatus.NOT_FOUND);
@@ -139,62 +116,57 @@ export class UserService {
       }
 
       if (email && user.email !== email) {
-        const existingEmail = await this.userRepo.findOne({
-          where: { email },
-        });
-
+        const existingEmail = await this.userRepo.findOne({ where: { email } });
         if (existingEmail) {
-          return {
-            success: false,
-            message: "User's Email ID Already Exists",
-          };
+          return { success: false, message: "User's Email ID Already Exists" };
         }
       }
 
       if (phone && user.phone !== phone) {
-        const existingPhone = await this.userRepo.findOne({
-          where: { phone },
-        });
-
+        const existingPhone = await this.userRepo.findOne({ where: { phone } });
         if (existingPhone) {
-          return {
-            success: false,
-            message: "User's Phone Number Already Exists",
-          };
+          return { success: false, message: "User's Phone Number Already Exists" };
         }
       }
 
-      const existingRole = await this.roleRepo.findOne({
-        where: { role: role },
-        relations: ["permissions"],
-      });
+      const existingRole = role
+        ? await this.roleRepo.findOne({ where: { id: role } })
+        : undefined;
 
       const newData = {
-        role: existingRole,
-        email: email,
-        phone: phone,
+        role: existingRole ?? undefined,
+        roleName: (updatedData as any).roleName ?? existingRole?.name ?? undefined,
+        email,
+        phone,
         ...rest,
       };
 
-      //update user
       this.userRepo.merge(user, newData);
-
-      //save user
       await this.userRepo.save(user);
 
-      //find updated and return
       const updatedUser = await this.userRepo.findOne({
-        where: { email: email },
-        relations: ["role", "role.permissions"],
+        where: { id },
+        relations: ["role"],
       });
-      return {
-        success: true,
-        message: "User Updated Successfully",
-        data: updatedUser,
-      };
+      return { success: true, message: "User Updated Successfully", data: updatedUser };
     } catch (error) {
       return error;
     }
+  }
+
+  async changePassword(userId: number, currentPassword: string, newPassword: string) {
+    const user = await this.userRepo.findOne({
+      where: { id: userId },
+      select: ['id', 'password'],
+    });
+    if (!user) throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+
+    const match = await bcrypt.compare(currentPassword, user.password);
+    if (!match) throw new HttpException('Current password is incorrect', HttpStatus.BAD_REQUEST);
+
+    const hashed = await bcrypt.hash(newPassword, 10);
+    await this.userRepo.update(userId, { password: hashed });
+    return { success: true, message: 'Password updated successfully' };
   }
 
   async deleteUser(id: number[]) {
@@ -204,11 +176,7 @@ export class UserService {
         throw new HttpException("Users not found", HttpStatus.NOT_FOUND);
       }
       await this.userRepo.delete(id);
-      return {
-        success: true,
-        message: "User Deleted Successfully",
-        data: users,
-      };
+      return { success: true, message: "User Deleted Successfully", data: users };
     } catch (error) {
       return error;
     }
