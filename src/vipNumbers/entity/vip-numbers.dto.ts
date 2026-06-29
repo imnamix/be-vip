@@ -34,6 +34,12 @@ export class VipNumbersDTO {
   @IsString()
   tag?: string;
 
+  @ApiProperty({ required: false, minimum: 0, maximum: 10 })
+  @IsOptional()
+  @Type(() => Number)
+  @IsNumber()
+  rating?: number;
+
   @ApiProperty({ required: false, default: 1 })
   @IsOptional()
   status?: number;

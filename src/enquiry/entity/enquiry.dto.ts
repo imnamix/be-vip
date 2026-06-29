@@ -71,6 +71,12 @@ export class EnquiryDTO {
   status: string;
 
   @ApiProperty()
+  isVipNumber: boolean;
+
+  @ApiProperty()
+  vipNumber: string;
+
+  @ApiProperty()
   suggestedNumbers: string;
 
   @ApiProperty()

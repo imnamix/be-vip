@@ -108,6 +108,15 @@ export class EN_Enquiry {
   @Column({ type: "varchar", length: 100, nullable: true, default: "Pending" })
   status: string;
 
+  // VIP number flag & direct entry
+  @ApiProperty()
+  @Column({ type: "boolean", nullable: true, default: false })
+  isVipNumber: boolean;
+
+  @ApiProperty()
+  @Column({ type: "varchar", length: 50, nullable: true, default: null })
+  vipNumber: string;
+
   // VIP number suggestion & confirmation
   @ApiProperty()
   @Column({ type: "text", nullable: true, default: null })

@@ -37,6 +37,10 @@ export class EN_VipNumber {
   tag: string;
 
   @ApiProperty()
+  @Column({ type: "decimal", precision: 3, scale: 1, nullable: true, default: null })
+  rating: number;
+
+  @ApiProperty()
   @Column({ type: "tinyint", default: 1 })
   status: number;
 
