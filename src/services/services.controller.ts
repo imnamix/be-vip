@@ -9,16 +9,22 @@ import {
   Post,
   Put,
   Query,
+  UseGuards,
 } from "@nestjs/common";
 import { ApiBody, ApiTags } from "@nestjs/swagger";
 import { ServicesDTO } from "./entity/services.dto";
 import { ServicesService } from "./services.service";
+import { AuthGuard } from '../auth/guards/auth.gaurd';
+import { PermissionGuard } from '../auth/guards/permission.guard';
+import { Permission } from '../auth/decorators/permission.decorator';
 
 @ApiTags("Services")
 @Controller("services")
 export class ServicesController {
   constructor(public servicesService: ServicesService) {}
 
+  @UseGuards(AuthGuard, PermissionGuard)
+  @Permission('Content', 'write')
   @Post("create")
   @ApiBody({ type: ServicesDTO })
   async create(@Body() payload: ServicesDTO) {
@@ -97,6 +103,8 @@ export class ServicesController {
     }
   }
 
+  @UseGuards(AuthGuard, PermissionGuard)
+  @Permission('Content', 'update')
   @Put("update/:id")
   @ApiBody({ type: ServicesDTO })
   async update(@Param("id") id: number, @Body() payload: ServicesDTO) {
@@ -124,6 +132,8 @@ export class ServicesController {
     }
   }
 
+  @UseGuards(AuthGuard, PermissionGuard)
+  @Permission('Content', 'delete')
   @Delete("delete/:id")
   async delete(@Param("id") id: number) {
     try {

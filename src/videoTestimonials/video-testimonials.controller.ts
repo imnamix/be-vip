@@ -9,16 +9,22 @@ import {
   Post,
   Put,
   Query,
+  UseGuards,
 } from "@nestjs/common";
 import { ApiBody, ApiTags } from "@nestjs/swagger";
 import { VideoTestimonialDTO } from "./entity/video-testimonial.dto";
 import { VideoTestimonialsService } from "./video-testimonials.service";
+import { AuthGuard } from '../auth/guards/auth.gaurd';
+import { PermissionGuard } from '../auth/guards/permission.guard';
+import { Permission } from '../auth/decorators/permission.decorator';
 
 @ApiTags("Video Testimonials")
 @Controller("video-testimonials")
 export class VideoTestimonialsController {
   constructor(private readonly svc: VideoTestimonialsService) {}
 
+  @UseGuards(AuthGuard, PermissionGuard)
+  @Permission('Content', 'write')
   @Post("create")
   @ApiBody({ type: VideoTestimonialDTO })
   async create(@Body() dto: VideoTestimonialDTO) {
@@ -55,6 +61,8 @@ export class VideoTestimonialsController {
     return data;
   }
 
+  @UseGuards(AuthGuard, PermissionGuard)
+  @Permission('Content', 'update')
   @Put("update/:id")
   @ApiBody({ type: VideoTestimonialDTO })
   async update(@Param("id") id: number, @Body() dto: VideoTestimonialDTO) {
@@ -63,6 +71,8 @@ export class VideoTestimonialsController {
     return data;
   }
 
+  @UseGuards(AuthGuard, PermissionGuard)
+  @Permission('Content', 'delete')
   @Delete("delete/:id")
   async delete(@Param("id") id: number) {
     const data = await this.svc.delete(id);

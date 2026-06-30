@@ -9,16 +9,22 @@ import {
   Post,
   Put,
   Query,
+  UseGuards,
 } from "@nestjs/common";
 import { ApiBody, ApiTags } from "@nestjs/swagger";
 import { TestimonialDTO } from "./entity/testimonial.dto";
 import { TestimonialsService } from "./testimonials.service";
+import { AuthGuard } from '../auth/guards/auth.gaurd';
+import { PermissionGuard } from '../auth/guards/permission.guard';
+import { Permission } from '../auth/decorators/permission.decorator';
 
 @ApiTags("Testimonials")
 @Controller("testimonials")
 export class TestimonialsController {
   constructor(private readonly svc: TestimonialsService) {}
 
+  @UseGuards(AuthGuard, PermissionGuard)
+  @Permission('Content', 'write')
   @Post("create")
   @ApiBody({ type: TestimonialDTO })
   async create(@Body() dto: TestimonialDTO) {
@@ -56,6 +62,8 @@ export class TestimonialsController {
     return data;
   }
 
+  @UseGuards(AuthGuard, PermissionGuard)
+  @Permission('Content', 'update')
   @Put("update/:id")
   @ApiBody({ type: TestimonialDTO })
   async update(@Param("id") id: number, @Body() dto: TestimonialDTO) {
@@ -64,6 +72,8 @@ export class TestimonialsController {
     return data;
   }
 
+  @UseGuards(AuthGuard, PermissionGuard)
+  @Permission('Content', 'delete')
   @Delete("delete/:id")
   async delete(@Param("id") id: number) {
     const data = await this.svc.delete(id);

@@ -41,7 +41,7 @@ async function bootstrap() {
     methods: "GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS",
     credentials: true,
     allowedHeaders: [
-      "Set-cookie, X-Requested-With,content-type, Origin, Accept, x-access-token, Authorization, baggage, Connection, Host",
+      "Set-cookie, X-Requested-With,content-type, Origin, Accept, x-access-token, Authorization, baggage, Connection, Host, x-permission-version",
     ],
   });
 

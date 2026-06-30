@@ -1,14 +1,19 @@
-import { Body, Controller, Get, HttpException, HttpStatus, Post } from "@nestjs/common";
-import { ApiBody, ApiTags } from "@nestjs/swagger";
-import { EventBannerDTO } from "./entity/event-banner.dto";
-import { EventBannerService } from "./event-banner.service";
+import { Body, Controller, Get, HttpException, HttpStatus, Post, UseGuards } from '@nestjs/common';
+import { ApiBody, ApiTags } from '@nestjs/swagger';
+import { EventBannerDTO } from './entity/event-banner.dto';
+import { EventBannerService } from './event-banner.service';
+import { AuthGuard } from '../auth/guards/auth.gaurd';
+import { PermissionGuard } from '../auth/guards/permission.guard';
+import { Permission } from '../auth/decorators/permission.decorator';
 
 @ApiTags("Event Banner")
 @Controller("event-banner")
 export class EventBannerController {
   constructor(private readonly svc: EventBannerService) {}
 
-  @Post("save")
+  @Post('save')
+  @UseGuards(AuthGuard, PermissionGuard)
+  @Permission('Events', 'write')
   @ApiBody({ type: EventBannerDTO })
   async save(@Body() dto: EventBannerDTO) {
     try {

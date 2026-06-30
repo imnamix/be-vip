@@ -9,17 +9,23 @@ import {
   Post,
   Put,
   Query,
+  UseGuards,
 } from "@nestjs/common";
 import { ApiBody, ApiQuery, ApiTags } from "@nestjs/swagger";
 import { HomePageDTO } from "./entity/homepage.dto";
 import { HomePageService } from "./homepage.service";
 import { DeleteHomeDTO } from "./entity/deleteHome.dto";
+import { AuthGuard } from '../auth/guards/auth.gaurd';
+import { PermissionGuard } from '../auth/guards/permission.guard';
+import { Permission } from '../auth/decorators/permission.decorator';
 
 @ApiTags("Home Page")
 @Controller("homePage")
 export class HomePageController {
   constructor(public homePageService: HomePageService) {}
 
+  @UseGuards(AuthGuard, PermissionGuard)
+  @Permission('Content', 'write')
   @Post("create")
   @ApiBody({ type: HomePageDTO })
   async create(@Body() payload: HomePageDTO) {
@@ -89,6 +95,8 @@ export class HomePageController {
     }
   }
 
+  @UseGuards(AuthGuard, PermissionGuard)
+  @Permission('Content', 'update')
   @Put("update/:id")
   @ApiBody({ type: HomePageDTO })
   async updateData(@Body() payload: HomePageDTO, @Param("id") id: number) {
@@ -114,6 +122,8 @@ export class HomePageController {
     }
   }
 
+  @UseGuards(AuthGuard, PermissionGuard)
+  @Permission('Content', 'delete')
   @Delete("delete")
   @ApiBody({ type: DeleteHomeDTO })
   async deleteHomeData(@Body() id: DeleteHomeDTO) {

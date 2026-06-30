@@ -51,9 +51,7 @@ export class SeedService implements OnApplicationBootstrap {
       );
       this.logger.log('Seeded role: Super Admin with all permissions');
     } else {
-      existing.permissions = SUPER_ADMIN_PERMISSIONS;
-      await this.roleRepo.save(existing);
-      this.logger.log('Super Admin role already exists — permissions synced');
+      this.logger.log('Super Admin role already exists — leaving stored permissions untouched');
     }
   }
 

@@ -6,16 +6,22 @@ import {
   HttpStatus,
   Post,
   Put,
+  UseGuards,
 } from "@nestjs/common";
 import { ApiBody, ApiTags } from "@nestjs/swagger";
 import { BrandInfoDTO } from "./entity/brandinfo.dto";
 import { BrandInfoService } from "./brandinfo.service";
+import { AuthGuard } from '../auth/guards/auth.gaurd';
+import { PermissionGuard } from '../auth/guards/permission.guard';
+import { Permission } from '../auth/decorators/permission.decorator';
 
 @ApiTags("Brand Info")
 @Controller("brandinfo")
 export class BrandInfoController {
   constructor(public brandinfoService: BrandInfoService) {}
 
+  @UseGuards(AuthGuard, PermissionGuard)
+  @Permission('Content', 'write')
   @Post("create")
   @ApiBody({ type: BrandInfoDTO })
   async createOrUpdate(@Body() payload: BrandInfoDTO) {
@@ -68,6 +74,8 @@ export class BrandInfoController {
     }
   }
 
+  @UseGuards(AuthGuard, PermissionGuard)
+  @Permission('Content', 'update')
   @Put("update")
   @ApiBody({ type: BrandInfoDTO })
   async update(@Body() payload: BrandInfoDTO) {

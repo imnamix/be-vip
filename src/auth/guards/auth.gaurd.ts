@@ -6,37 +6,31 @@ import {
   Injectable,
 } from '@nestjs/common';
 import * as jwt from 'jsonwebtoken';
+import { JwtPayload } from '../interfaces/jwt-payload.interface';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
-  constructor() {}
-
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
-
-    if (request) {
-      if (!request.headers.authorization) {
-        return false;
-      }
-      request.user = await this.validateToken(request.headers.authorization);
-      return true;
-    } else {
-      return false;
+    if (!request?.headers?.authorization) {
+      throw new HttpException('Authorization header missing', HttpStatus.UNAUTHORIZED);
     }
+    request.user = await this.validateToken(request.headers.authorization);
+    return true;
   }
 
-  async validateToken(auth: string) {
-    if (auth.split(' ')[0] !== 'Bearer') {
-      throw new HttpException('Invalid token', HttpStatus.UNAUTHORIZED);
+  async validateToken(auth: string): Promise<JwtPayload> {
+    const [scheme, token] = auth.split(' ');
+    if (scheme !== 'Bearer' || !token) {
+      throw new HttpException('Invalid authorization format', HttpStatus.UNAUTHORIZED);
     }
-    const token = auth.split(' ')[1];
-
     try {
-      const decoded: any = await jwt.verify(token, process.env.SECRET);
-      return decoded;
+      return jwt.verify(token, process.env.SECRET) as JwtPayload;
     } catch (err) {
-      const message = 'Token error: ' + (err.message || err.name);
-      throw new HttpException(message, HttpStatus.UNAUTHORIZED);
+      throw new HttpException(
+        'Token error: ' + (err.message || err.name),
+        HttpStatus.UNAUTHORIZED,
+      );
     }
   }
 }

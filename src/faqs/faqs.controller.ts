@@ -9,16 +9,22 @@ import {
   Post,
   Put,
   Query,
+  UseGuards,
 } from "@nestjs/common";
 import { ApiBody, ApiTags } from "@nestjs/swagger";
 import { FaqDTO } from "./entity/faq.dto";
 import { FaqsService } from "./faqs.service";
+import { AuthGuard } from '../auth/guards/auth.gaurd';
+import { PermissionGuard } from '../auth/guards/permission.guard';
+import { Permission } from '../auth/decorators/permission.decorator';
 
 @ApiTags("FAQs")
 @Controller("faqs")
 export class FaqsController {
   constructor(private readonly svc: FaqsService) {}
 
+  @UseGuards(AuthGuard, PermissionGuard)
+  @Permission('Content', 'write')
   @Post("create")
   @ApiBody({ type: FaqDTO })
   async create(@Body() dto: FaqDTO) {
@@ -55,6 +61,8 @@ export class FaqsController {
     return data;
   }
 
+  @UseGuards(AuthGuard, PermissionGuard)
+  @Permission('Content', 'update')
   @Put("update/:id")
   @ApiBody({ type: FaqDTO })
   async update(@Param("id") id: number, @Body() dto: FaqDTO) {
@@ -63,6 +71,8 @@ export class FaqsController {
     return data;
   }
 
+  @UseGuards(AuthGuard, PermissionGuard)
+  @Permission('Content', 'delete')
   @Delete("delete/:id")
   async delete(@Param("id") id: number) {
     const data = await this.svc.delete(id);

@@ -9,57 +9,51 @@ import {
   Patch,
   Post,
   Query,
-} from "@nestjs/common";
-import { ApiBody, ApiQuery, ApiTags } from "@nestjs/swagger";
-import { EnquiryService } from "./enquiry.service";
-import { DeleteEnquiryDTO, EnquiryDTO } from "./entity/enquiry.dto";
+  UseGuards,
+} from '@nestjs/common';
+import { ApiBody, ApiQuery, ApiTags } from '@nestjs/swagger';
 
-@ApiTags("enquiry")
-@Controller("enquiry")
+import { EnquiryService } from './enquiry.service';
+import { DeleteEnquiryDTO, EnquiryDTO } from './entity/enquiry.dto';
+import { AuthGuard } from '../auth/guards/auth.gaurd';
+import { PermissionGuard } from '../auth/guards/permission.guard';
+import { Permission } from '../auth/decorators/permission.decorator';
+
+@ApiTags('enquiry')
+@Controller('enquiry')
 export class EnquiryController {
   constructor(public enquiryService: EnquiryService) {}
 
-  @Post("create")
+  // Public — submitted from the website booking form
+  @Post('create')
   @ApiBody({ type: EnquiryDTO })
   async create(@Body() payload: EnquiryDTO) {
     try {
       const newEnquiry = await this.enquiryService.createEnquiry(payload);
-      return {
-        success: true,
-        message: "Enquiry send successfully.",
-        data: newEnquiry,
-      };
+      return { success: true, message: 'Enquiry sent successfully.', data: newEnquiry };
     } catch (error) {
       throw new HttpException(
-        {
-          success: false,
-          message: "Error While Sending New Enquiry",
-          error: error,
-        },
-        HttpStatus.INTERNAL_SERVER_ERROR
+        { success: false, message: 'Error while sending enquiry', error },
+        HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
   }
 
-  @Get("allEnquiries")
-  @ApiQuery({ name: "page", required: false, type: Number })
-  @ApiQuery({ name: "limit", required: false, type: Number })
-  @ApiQuery({ name: "search", required: false, type: String })
-  @ApiQuery({ name: "status", required: false, type: String })
+  @Get('allEnquiries')
+  @UseGuards(AuthGuard, PermissionGuard)
+  @Permission('Inquiry', 'read')
+  @ApiQuery({ name: 'page',   required: false, type: Number })
+  @ApiQuery({ name: 'limit',  required: false, type: Number })
+  @ApiQuery({ name: 'search', required: false, type: String })
+  @ApiQuery({ name: 'status', required: false, type: String })
   async getAllEnquiry(
-    @Query("page") page: number = 1,
-    @Query("limit") limit: number = 10,
-    @Query("search") search: string,
-    @Query("status") status: string
+    @Query('page')   page: number  = 1,
+    @Query('limit')  limit: number = 10,
+    @Query('search') search: string,
+    @Query('status') status: string,
   ) {
     try {
-      const allData = await this.enquiryService.getAllEnquiry({
-        page,
-        limit,
-        search,
-        status,
-      });
-
+      const allData = await this.enquiryService.getAllEnquiry({ page, limit, search, status });
       return {
         success: allData.success,
         message: allData.message,
@@ -68,73 +62,69 @@ export class EnquiryController {
       };
     } catch (error) {
       throw new HttpException(
-        {
-          success: false,
-          message: "Error While fetching Enquires",
-          error: error,
-        },
-        HttpStatus.INTERNAL_SERVER_ERROR
+        { success: false, message: 'Error while fetching enquiries', error },
+        HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
   }
 
-  @Get("statusCounts")
+  @Get('statusCounts')
+  @UseGuards(AuthGuard, PermissionGuard)
+  @Permission('Inquiry', 'read')
   async getStatusCounts() {
     try {
       return await this.enquiryService.getStatusCounts();
     } catch (error) {
       throw new HttpException(
-        { success: false, message: "Error fetching status counts", error },
-        HttpStatus.INTERNAL_SERVER_ERROR
+        { success: false, message: 'Error fetching status counts', error },
+        HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
   }
 
-  @Get(":id")
-  async getById(@Param("id") id: number) {
+  @Get(':id')
+  @UseGuards(AuthGuard, PermissionGuard)
+  @Permission('Inquiry', 'read')
+  async getById(@Param('id') id: number) {
     try {
       const data = await this.enquiryService.getEnquiryById(id);
       return { success: true, data };
     } catch (error) {
       throw new HttpException(
-        { success: false, message: "Error fetching enquiry", error },
-        HttpStatus.INTERNAL_SERVER_ERROR
+        { success: false, message: 'Error fetching enquiry', error },
+        HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
   }
 
-  @Patch("update/:id")
+  @Patch('update/:id')
+  @UseGuards(AuthGuard, PermissionGuard)
+  @Permission('Inquiry', 'update')
   @ApiBody({ type: EnquiryDTO })
-  async update(@Param("id") id: number, @Body() payload: Partial<EnquiryDTO>) {
+  async update(@Param('id') id: number, @Body() payload: Partial<EnquiryDTO>) {
     try {
       const data = await this.enquiryService.updateEnquiry(id, payload);
-      return { success: true, message: "Enquiry updated successfully", data };
+      return { success: true, message: 'Enquiry updated successfully', data };
     } catch (error) {
       throw new HttpException(
-        { success: false, message: "Error updating enquiry", error },
-        HttpStatus.INTERNAL_SERVER_ERROR
+        { success: false, message: 'Error updating enquiry', error },
+        HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
   }
 
-  @Delete("delete")
+  @Delete('delete')
+  @UseGuards(AuthGuard, PermissionGuard)
+  @Permission('Inquiry', 'delete')
   @ApiBody({ type: DeleteEnquiryDTO })
   async deleteEnquiry(@Body() id: DeleteEnquiryDTO) {
     try {
-      const data = await this.enquiryService.deleteEnquiry(id.ids);
-      return {
-        success: data.success,
-        message: data.message,
-        data: data.data,
-      };
+      const data = await this.enquiryService.deleteEnquiry(id.ids) as any;
+      return { success: data.success, message: data.message, data: data.data };
     } catch (error) {
       throw new HttpException(
-        {
-          success: false,
-          message: "Error While fetching Enquires",
-          error: error,
-        },
-        HttpStatus.INTERNAL_SERVER_ERROR
+        { success: false, message: 'Error while deleting enquiry', error },
+        HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
   }

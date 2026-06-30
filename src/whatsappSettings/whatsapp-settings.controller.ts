@@ -1,14 +1,19 @@
-import { Body, Controller, Get, HttpException, HttpStatus, Post } from "@nestjs/common";
-import { ApiBody, ApiTags } from "@nestjs/swagger";
-import { WhatsappSettingsService } from "./whatsapp-settings.service";
-import { WhatsappSettingsDTO } from "./entity/whatsapp-settings.dto";
+import { Body, Controller, Get, HttpException, HttpStatus, Post, UseGuards } from '@nestjs/common';
+import { ApiBody, ApiTags } from '@nestjs/swagger';
+import { WhatsappSettingsService } from './whatsapp-settings.service';
+import { WhatsappSettingsDTO } from './entity/whatsapp-settings.dto';
+import { AuthGuard } from '../auth/guards/auth.gaurd';
+import { PermissionGuard } from '../auth/guards/permission.guard';
+import { Permission } from '../auth/decorators/permission.decorator';
 
-@ApiTags("whatsapp-settings")
-@Controller("whatsappSettings")
+@ApiTags('whatsapp-settings')
+@Controller('whatsappSettings')
+@UseGuards(AuthGuard, PermissionGuard)
 export class WhatsappSettingsController {
   constructor(private readonly service: WhatsappSettingsService) {}
 
-  @Get("get")
+  @Get('get')
+  @Permission('Settings', 'read')
   async get() {
     try {
       const data = await this.service.get();
@@ -21,7 +26,8 @@ export class WhatsappSettingsController {
     }
   }
 
-  @Post("save")
+  @Post('save')
+  @Permission('Settings', 'write')
   @ApiBody({ type: WhatsappSettingsDTO })
   async save(@Body() payload: WhatsappSettingsDTO) {
     try {

@@ -36,9 +36,12 @@ export class UserService {
 
       const hashPassword = await bcrypt.hash(password, 10);
 
+      const roleNameInput = (rest as any).roleName as string | undefined;
       const existingRole = role
         ? await this.roleRepo.findOne({ where: { id: role } })
-        : null;
+        : roleNameInput
+          ? await this.roleRepo.findOne({ where: { name: roleNameInput } })
+          : null;
 
       const user = this.userRepo.create({
         email,
@@ -131,7 +134,9 @@ export class UserService {
 
       const existingRole = role
         ? await this.roleRepo.findOne({ where: { id: role } })
-        : undefined;
+        : updatedData.roleName
+          ? await this.roleRepo.findOne({ where: { name: updatedData.roleName } })
+          : undefined;
 
       const newData: any = {
         role: existingRole ?? undefined,

@@ -9,83 +9,93 @@ import {
   Post,
   Put,
   Query,
-} from "@nestjs/common";
-import { ApiBody, ApiQuery, ApiTags } from "@nestjs/swagger";
-import { RolesService } from "./roles.service";
-import { CreateRoleDTO, UpdateRoleDTO, DeleteRoleDTO } from "./entity/role.dto";
+  UseGuards,
+} from '@nestjs/common';
+import { ApiBody, ApiQuery, ApiTags } from '@nestjs/swagger';
 
-@ApiTags("Roles")
-@Controller("roles")
+import { RolesService } from './roles.service';
+import { CreateRoleDTO, UpdateRoleDTO, DeleteRoleDTO } from './entity/role.dto';
+import { AuthGuard } from '../auth/guards/auth.gaurd';
+import { PermissionGuard } from '../auth/guards/permission.guard';
+import { Permission } from '../auth/decorators/permission.decorator';
+
+@ApiTags('Roles')
+@Controller('roles')
+@UseGuards(AuthGuard, PermissionGuard)
 export class RolesController {
   constructor(private readonly rolesService: RolesService) {}
 
-  @Post("create")
+  @Post('create')
+  @Permission('Roles', 'write')
   @ApiBody({ type: CreateRoleDTO })
   async create(@Body() dto: CreateRoleDTO) {
     try {
-      const result = await this.rolesService.create(dto);
-      return result;
+      return await this.rolesService.create(dto);
     } catch (error) {
       throw new HttpException(
-        { success: false, message: "Error while creating role", error },
-        HttpStatus.INTERNAL_SERVER_ERROR
+        { success: false, message: 'Error while creating role', error },
+        HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
   }
 
-  @Get("getAll")
-  @ApiQuery({ name: "page",   required: false, type: Number })
-  @ApiQuery({ name: "limit",  required: false, type: Number })
-  @ApiQuery({ name: "search", required: false, type: String })
+  @Get('getAll')
+  @Permission('Roles', 'read')
+  @ApiQuery({ name: 'page',   required: false, type: Number })
+  @ApiQuery({ name: 'limit',  required: false, type: Number })
+  @ApiQuery({ name: 'search', required: false, type: String })
   async getAll(
-    @Query("page")   page: number  = 1,
-    @Query("limit")  limit: number = 100,
-    @Query("search") search: string
+    @Query('page')   page: number  = 1,
+    @Query('limit')  limit: number = 100,
+    @Query('search') search: string,
   ) {
     try {
       return await this.rolesService.getAll({ page, limit, search });
     } catch (error) {
       throw new HttpException(
-        { success: false, message: "Error while fetching roles", error },
-        HttpStatus.INTERNAL_SERVER_ERROR
+        { success: false, message: 'Error while fetching roles', error },
+        HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
   }
 
-  @Get("getById/:id")
-  async getById(@Param("id") id: number) {
+  @Get('getById/:id')
+  @Permission('Roles', 'read')
+  async getById(@Param('id') id: number) {
     try {
       return await this.rolesService.getById(id);
     } catch (error) {
       throw new HttpException(
         { success: false, message: `Error while fetching role with id ${id}`, error },
-        HttpStatus.INTERNAL_SERVER_ERROR
+        HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
   }
 
-  @Put("updateRole/:id")
+  @Put('updateRole/:id')
+  @Permission('Roles', 'update')
   @ApiBody({ type: UpdateRoleDTO })
-  async update(@Param("id") id: number, @Body() dto: UpdateRoleDTO) {
+  async update(@Param('id') id: number, @Body() dto: UpdateRoleDTO) {
     try {
       return await this.rolesService.update(id, dto);
     } catch (error) {
       throw new HttpException(
-        { success: false, message: "Error while updating role", error },
-        HttpStatus.INTERNAL_SERVER_ERROR
+        { success: false, message: 'Error while updating role', error },
+        HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
   }
 
-  @Delete("deleteRole")
+  @Delete('deleteRole')
+  @Permission('Roles', 'delete')
   @ApiBody({ type: DeleteRoleDTO })
   async delete(@Body() dto: DeleteRoleDTO) {
     try {
       return await this.rolesService.delete(dto.ids);
     } catch (error) {
       throw new HttpException(
-        { success: false, message: "Error while deleting role(s)", error },
-        HttpStatus.INTERNAL_SERVER_ERROR
+        { success: false, message: 'Error while deleting role(s)', error },
+        HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
   }

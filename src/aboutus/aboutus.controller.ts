@@ -9,18 +9,24 @@ import {
   Post,
   Put,
   Query,
+  UseGuards,
 } from "@nestjs/common";
 import { ApiBody, ApiQuery, ApiTags } from "@nestjs/swagger";
 import { AboutusDTO } from "./entity/aboutus.dto";
 import { AboutUsService } from "./aboutus.service";
 import { DeleteAboutDTO } from "./entity/deleteAbout.dto";
 import { EN_AboutUs } from "./entity/aboutus.entity";
+import { AuthGuard } from '../auth/guards/auth.gaurd';
+import { PermissionGuard } from '../auth/guards/permission.guard';
+import { Permission } from '../auth/decorators/permission.decorator';
 
 @ApiTags("About Us")
 @Controller("aboutus")
 export class AboutusController {
   constructor(public aboutusService: AboutUsService) {}
 
+  @UseGuards(AuthGuard, PermissionGuard)
+  @Permission('Content', 'write')
   @Post("create")
   @ApiBody({ type: AboutusDTO })
   async create(@Body() payload: AboutusDTO) {
@@ -96,6 +102,8 @@ export class AboutusController {
     }
   }
 
+  @UseGuards(AuthGuard, PermissionGuard)
+  @Permission('Content', 'update')
   @Put("updateAboutUs/:id")
   @ApiBody({ type: AboutusDTO })
   async updateAboutUs(@Param("id") id: number, @Body() payload: AboutusDTO) {
@@ -122,6 +130,8 @@ export class AboutusController {
     }
   }
 
+  @UseGuards(AuthGuard, PermissionGuard)
+  @Permission('Content', 'delete')
   @Delete("deleteAboutus")
   @ApiBody({ type: DeleteAboutDTO })
   async deletePlantLoc(@Body() id: DeleteAboutDTO) {

@@ -9,16 +9,22 @@ import {
   Post,
   Put,
   Query,
+  UseGuards,
 } from "@nestjs/common";
 import { ApiBody, ApiQuery, ApiTags } from "@nestjs/swagger";
 import { ContactService } from "./contact.service";
 import { ContactDTO, DeleteContactDTO } from "./entity/contact.dto";
+import { AuthGuard } from '../auth/guards/auth.gaurd';
+import { PermissionGuard } from '../auth/guards/permission.guard';
+import { Permission } from '../auth/decorators/permission.decorator';
 
 @ApiTags("Contact")
 @Controller("contact")
 export class ContactController {
   constructor(private readonly contactService: ContactService) {}
 
+  @UseGuards(AuthGuard, PermissionGuard)
+  @Permission('Content', 'write')
   @Post("create")
   @ApiBody({ type: ContactDTO })
   async create(@Body() payload: ContactDTO) {
@@ -63,6 +69,8 @@ export class ContactController {
     }
   }
 
+  @UseGuards(AuthGuard, PermissionGuard)
+  @Permission('Content', 'update')
   @Put("update/:id")
   @ApiBody({ type: ContactDTO })
   async update(@Param("id") id: number, @Body() payload: ContactDTO) {
@@ -77,6 +85,8 @@ export class ContactController {
     }
   }
 
+  @UseGuards(AuthGuard, PermissionGuard)
+  @Permission('Content', 'delete')
   @Delete("delete")
   @ApiBody({ type: DeleteContactDTO })
   async delete(@Body() body: DeleteContactDTO) {

@@ -9,16 +9,22 @@ import {
   Post,
   Put,
   Query,
+  UseGuards,
 } from "@nestjs/common";
 import { ApiBody, ApiTags } from "@nestjs/swagger";
 import { GalleryDTO } from "./entity/gallery.dto";
 import { GalleryService } from "./gallery.service";
+import { AuthGuard } from '../auth/guards/auth.gaurd';
+import { PermissionGuard } from '../auth/guards/permission.guard';
+import { Permission } from '../auth/decorators/permission.decorator';
 
 @ApiTags("Gallery")
 @Controller("gallery")
 export class GalleryController {
   constructor(public galleryService: GalleryService) {}
 
+  @UseGuards(AuthGuard, PermissionGuard)
+  @Permission('Content', 'write')
   @Post("create")
   @ApiBody({ type: GalleryDTO })
   async create(@Body() payload: GalleryDTO) {
@@ -69,6 +75,8 @@ export class GalleryController {
     }
   }
 
+  @UseGuards(AuthGuard, PermissionGuard)
+  @Permission('Content', 'update')
   @Put("update/:id")
   @ApiBody({ type: GalleryDTO })
   async update(@Param("id") id: number, @Body() payload: GalleryDTO) {
@@ -86,6 +94,8 @@ export class GalleryController {
     }
   }
 
+  @UseGuards(AuthGuard, PermissionGuard)
+  @Permission('Content', 'delete')
   @Delete("delete/:id")
   async delete(@Param("id") id: number) {
     try {

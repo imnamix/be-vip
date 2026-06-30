@@ -9,18 +9,24 @@ import {
   Post,
   Put,
   Query,
-} from "@nestjs/common";
-import { ApiBody, ApiQuery, ApiTags } from "@nestjs/swagger";
-import { CustomerService } from "./customer.service";
-import { CustomerDTO } from "./entity/customer.dto";
-import { DeleteCustomerDTO } from "./entity/deleteCustomer.dto";
+  UseGuards,
+} from '@nestjs/common';
+import { ApiBody, ApiQuery, ApiTags } from '@nestjs/swagger';
+import { CustomerService } from './customer.service';
+import { CustomerDTO } from './entity/customer.dto';
+import { DeleteCustomerDTO } from './entity/deleteCustomer.dto';
+import { AuthGuard } from '../auth/guards/auth.gaurd';
+import { PermissionGuard } from '../auth/guards/permission.guard';
+import { Permission } from '../auth/decorators/permission.decorator';
 
-@ApiTags("Customers")
-@Controller("customers")
+@ApiTags('Customers')
+@Controller('customers')
+@UseGuards(AuthGuard, PermissionGuard)
 export class CustomerController {
   constructor(public customerService: CustomerService) {}
 
-  @Post("create")
+  @Post('create')
+  @Permission('Customers', 'write')
   @ApiBody({ type: CustomerDTO })
   async create(@Body() payload: CustomerDTO) {
     try {
@@ -41,10 +47,11 @@ export class CustomerController {
       );
     }
   }
-  @Get("getAllCustomers")
-  @ApiQuery({ name: "page", required: false, type: Number })
-  @ApiQuery({ name: "limit", required: false, type: Number })
-  @ApiQuery({ name: "search", required: false, type: String }) //to make search optional
+  @Get('getAllCustomers')
+  @Permission('Customers', 'read')
+  @ApiQuery({ name: 'page',   required: false, type: Number })
+  @ApiQuery({ name: 'limit',  required: false, type: Number })
+  @ApiQuery({ name: 'search', required: false, type: String })
   async getAllCustomers(
     @Query("page") page: number = 1,
     @Query("limit") limit: number = 1000,
@@ -74,7 +81,8 @@ export class CustomerController {
     }
   }
 
-  @Get("getCustomerById/:id")
+  @Get('getCustomerById/:id')
+  @Permission('Customers', 'read')
   async getCustomerById(@Param("id") id: number) {
     try {
       const customer = await this.customerService.getCustomerById(id);
@@ -95,7 +103,8 @@ export class CustomerController {
     }
   }
 
-  @Put("updateCustomer/:id")
+  @Put('updateCustomer/:id')
+  @Permission('Customers', 'update')
   async updateCustomer(@Param("id") id: number, @Body() payload: CustomerDTO) {
     try {
       const customer = await this.customerService.updateCustomer(id, payload);
@@ -116,7 +125,8 @@ export class CustomerController {
     }
   }
 
-  @Delete("deleteCustomer")
+  @Delete('deleteCustomer')
+  @Permission('Customers', 'delete')
   @ApiBody({ type: DeleteCustomerDTO })
   async deleteCustomer(@Body() id: DeleteCustomerDTO) {
     try {
