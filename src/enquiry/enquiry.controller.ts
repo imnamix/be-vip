@@ -42,18 +42,22 @@ export class EnquiryController {
   @Get('allEnquiries')
   @UseGuards(AuthGuard, PermissionGuard)
   @Permission('Inquiry', 'read')
-  @ApiQuery({ name: 'page',   required: false, type: Number })
-  @ApiQuery({ name: 'limit',  required: false, type: Number })
-  @ApiQuery({ name: 'search', required: false, type: String })
-  @ApiQuery({ name: 'status', required: false, type: String })
+  @ApiQuery({ name: 'page',      required: false, type: Number })
+  @ApiQuery({ name: 'limit',     required: false, type: Number })
+  @ApiQuery({ name: 'search',    required: false, type: String })
+  @ApiQuery({ name: 'status',    required: false, type: String })
+  @ApiQuery({ name: 'startDate', required: false, type: String })
+  @ApiQuery({ name: 'endDate',   required: false, type: String })
   async getAllEnquiry(
-    @Query('page')   page: number  = 1,
-    @Query('limit')  limit: number = 10,
-    @Query('search') search: string,
-    @Query('status') status: string,
+    @Query('page')      page: number  = 1,
+    @Query('limit')      limit: number = 10,
+    @Query('search')    search: string,
+    @Query('status')    status: string,
+    @Query('startDate') startDate: string,
+    @Query('endDate')   endDate: string,
   ) {
     try {
-      const allData = await this.enquiryService.getAllEnquiry({ page, limit, search, status });
+      const allData = await this.enquiryService.getAllEnquiry({ page, limit, search, status, startDate, endDate });
       return {
         success: allData.success,
         message: allData.message,
@@ -106,6 +110,7 @@ export class EnquiryController {
       const data = await this.enquiryService.updateEnquiry(id, payload);
       return { success: true, message: 'Enquiry updated successfully', data };
     } catch (error) {
+      if (error instanceof HttpException) throw error;
       throw new HttpException(
         { success: false, message: 'Error updating enquiry', error },
         HttpStatus.INTERNAL_SERVER_ERROR,

@@ -97,6 +97,30 @@ export class EnquiryDTO {
   @ApiProperty()
   numerologistCommissionPaid: boolean;
 
+  @ApiProperty()
+  deliveryId: string;
+
+  @ApiProperty()
+  deliveryPartnerName: string;
+
+  @ApiProperty()
+  deliveryPartnerMobile: string;
+
+  @ApiProperty()
+  expectedDeliveryDate: string;
+
+  @ApiProperty()
+  deliveryAddress: string;
+
+  @ApiProperty()
+  deliveredDate: string;
+
+  @ApiProperty()
+  deliveryNotes: string;
+
+  @ApiProperty()
+  cancelReason: string;
+
   created_at: Date;
   updated_at: Date;
 

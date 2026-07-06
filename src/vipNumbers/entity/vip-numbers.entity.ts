@@ -41,6 +41,10 @@ export class EN_VipNumber {
   rating: number;
 
   @ApiProperty()
+  @Column({ type: "varchar", length: 100, nullable: true, default: null })
+  numerologyScore: string;
+
+  @ApiProperty()
   @Column({ type: "tinyint", default: 1 })
   status: number;
 

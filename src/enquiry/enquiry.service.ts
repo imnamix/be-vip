@@ -1,7 +1,7 @@
 import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { EN_Enquiry } from "./entity/enquiry.entity";
-import { In, Like, Repository } from "typeorm";
+import { Between, In, LessThanOrEqual, Like, MoreThanOrEqual, Repository } from "typeorm";
 import { EnquiryDTO } from "./entity/enquiry.dto";
 
 @Injectable()
@@ -39,6 +39,49 @@ export class EnquiryService {
 
   async updateEnquiry(id: number, payload: Partial<EN_Enquiry>) {
     try {
+      if (
+        payload.status === "Dispatched" ||
+        payload.status === "Delivered" ||
+        payload.status === "Cancelled"
+      ) {
+        const existing = await this.enquiryRepo.findOne({ where: { id: Number(id) } });
+        if (!existing) {
+          throw new HttpException(`Enquiry ${id} not found`, HttpStatus.NOT_FOUND);
+        }
+
+        if (payload.status === "Dispatched") {
+          const partnerName   = payload.deliveryPartnerName   ?? existing.deliveryPartnerName;
+          const partnerMobile = payload.deliveryPartnerMobile ?? existing.deliveryPartnerMobile;
+          const deliveryDate  = payload.expectedDeliveryDate  ?? existing.expectedDeliveryDate;
+          const deliveryAddr  = payload.deliveryAddress       ?? existing.deliveryAddress;
+
+          if (!partnerName || !partnerMobile || !deliveryDate || !deliveryAddr) {
+            throw new HttpException(
+              "Delivery partner name, mobile number, expected delivery date and delivery address are required to mark an order as Dispatched",
+              HttpStatus.BAD_REQUEST,
+            );
+          }
+
+          if (!existing.deliveryId) {
+            payload.deliveryId = `DEL${String(id).padStart(5, "0")}`;
+          }
+        }
+
+        if (payload.status === "Delivered" && !payload.deliveredDate && !existing.deliveredDate) {
+          payload.deliveredDate = new Date().toLocaleDateString("en-CA", { timeZone: "Asia/Kolkata" });
+        }
+
+        if (payload.status === "Cancelled") {
+          const reason = payload.cancelReason ?? existing.cancelReason;
+          if (!reason) {
+            throw new HttpException(
+              "A cancellation reason is required to mark an order as Cancelled",
+              HttpStatus.BAD_REQUEST,
+            );
+          }
+        }
+      }
+
       await this.enquiryRepo.update(Number(id), payload);
       return await this.enquiryRepo.findOne({ where: { id: Number(id) } });
     } catch (error) {
@@ -51,9 +94,11 @@ export class EnquiryService {
     limit: number;
     search: string;
     status?: string;
+    startDate?: string;
+    endDate?: string;
   }) {
     try {
-      const { page, limit, search, status } = pagination;
+      const { page, limit, search, status, startDate, endDate } = pagination;
       let pageSize = 1000000;
       let skip = 0;
       if (page) {
@@ -63,19 +108,56 @@ export class EnquiryService {
         }
       }
 
+      const statusList = status
+        ? status.split(",").map((s) => s.trim()).filter(Boolean)
+        : [];
+      const statusFilter: any =
+        statusList.length > 1 ? In(statusList) : statusList[0];
+
+      let dateFilter: any = null;
+      if (startDate && endDate) {
+        const start = new Date(startDate);
+        start.setHours(0, 0, 0, 0);
+        const end = new Date(endDate);
+        end.setHours(23, 59, 59, 999);
+        dateFilter = Between(start, end);
+      } else if (startDate) {
+        const start = new Date(startDate);
+        start.setHours(0, 0, 0, 0);
+        dateFilter = MoreThanOrEqual(start);
+      } else if (endDate) {
+        const end = new Date(endDate);
+        end.setHours(23, 59, 59, 999);
+        dateFilter = LessThanOrEqual(end);
+      }
+
+      const baseFilter: any = {};
+      if (statusFilter) baseFilter.status = statusFilter;
+      if (dateFilter) baseFilter.created_at = dateFilter;
+      const hasBaseFilter = Object.keys(baseFilter).length > 0;
+
+      const SEARCHABLE_FIELDS = [
+        "name",
+        "mobile",
+        "deliveryId",
+        "confirmedNumber",
+        "vipNumber",
+        "deliveryPartnerName",
+        "deliveryPartnerMobile",
+      ] as const;
+
       let whereCondition: any = null;
-      if (status && search) {
-        whereCondition = [
-          { name: Like(`%${search}%`), status },
-          { mobile: Like(`%${search}%`), status },
-        ];
-      } else if (status) {
-        whereCondition = { status };
+      if (hasBaseFilter && search) {
+        whereCondition = SEARCHABLE_FIELDS.map((field) => ({
+          [field]: Like(`%${search}%`),
+          ...baseFilter,
+        }));
+      } else if (hasBaseFilter) {
+        whereCondition = baseFilter;
       } else if (search) {
-        whereCondition = [
-          { name: Like(`%${search}%`) },
-          { mobile: Like(`%${search}%`) },
-        ];
+        whereCondition = SEARCHABLE_FIELDS.map((field) => ({
+          [field]: Like(`%${search}%`),
+        }));
       }
 
       const [data, total] = await this.enquiryRepo.findAndCount({

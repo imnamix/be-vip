@@ -149,6 +149,39 @@ export class EN_Enquiry {
   @Column({ type: "varchar", length: 1000, nullable: true, default: null })
   paymentProofUrl: string; // S3 URL of uploaded proof
 
+  // Dispatch / delivery tracking
+  @ApiProperty()
+  @Column({ type: "varchar", length: 50, nullable: true, default: null })
+  deliveryId: string; // auto-generated when order is marked Dispatched
+
+  @ApiProperty()
+  @Column({ type: "varchar", length: 255, nullable: true, default: null })
+  deliveryPartnerName: string;
+
+  @ApiProperty()
+  @Column({ type: "varchar", length: 20, nullable: true, default: null })
+  deliveryPartnerMobile: string;
+
+  @ApiProperty()
+  @Column({ type: "varchar", length: 20, nullable: true, default: null })
+  expectedDeliveryDate: string;
+
+  @ApiProperty()
+  @Column({ type: "varchar", length: 500, nullable: true, default: null })
+  deliveryAddress: string;
+
+  @ApiProperty()
+  @Column({ type: "varchar", length: 20, nullable: true, default: null })
+  deliveredDate: string;
+
+  @ApiProperty()
+  @Column({ type: "longtext", nullable: true, default: null })
+  deliveryNotes: string;
+
+  @ApiProperty()
+  @Column({ type: "varchar", length: 500, nullable: true, default: null })
+  cancelReason: string; // required when status is set to Cancelled
+
   @ApiProperty()
   @CreateDateColumn({ type: "datetime" })
   created_at: Date;

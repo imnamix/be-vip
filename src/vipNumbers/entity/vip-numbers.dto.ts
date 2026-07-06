@@ -40,6 +40,11 @@ export class VipNumbersDTO {
   @IsNumber()
   rating?: number;
 
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsString()
+  numerologyScore?: string;
+
   @ApiProperty({ required: false, default: 1 })
   @IsOptional()
   status?: number;
