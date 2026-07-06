@@ -35,51 +35,51 @@ require("dotenv").config();
 
 @Module({
   imports: [
-    // TypeOrmModule.forRoot({
-    //   type: "mysql",
-    //   // Database credentials
-    //   host: process.env.DB_HOST,
-    //   port: parseInt(process.env.DB_PORT || "3306", 10),
-    //   username: process.env.DB_USERNAME,
-    //   password: process.env.DB_PASSWORD,
-    //   database: process.env.DB_NAME,
-    //   // Entities
-    //   entities: [__dirname + "/**/*.entity{.ts,.js}"],
-    //   // Auto sync (disable in production if possible)
-    //   synchronize: process.env.NODE_ENV !== "production",
-    //   // Connection pooling - CRITICAL FOR PERFORMANCE
-    //   poolSize: 20,
-    //   maxQueryExecutionTime: 60000, // 60 seconds timeout
-    //   connectTimeout: 10000,
-    //   // Query optimization
-    //   cache: {
-    //     type: "database",
-    //     duration: 300000, // 5 minutes cache
-    //   },
-    //   // Logging - disable for production
-    //   logging: process.env.NODE_ENV !== "production" ? ["error", "warn"] : false,
-    //   // Required for TiDB Cloud / secure MySQL connections
-    //   ssl: { rejectUnauthorized: false },
-    //   extra: {
-    //     ssl: { rejectUnauthorized: false },
-    //   },
-    //   // Retry configuration
-    //   retryAttempts: 10,
-    //   retryDelay: 3000,
-    // }),
-
     TypeOrmModule.forRoot({
       type: "mysql",
+      // Database credentials
       host: process.env.DB_HOST,
-      port: parseInt(process.env.DB_PORT, 10),
+      port: parseInt(process.env.DB_PORT || "3306", 10),
       username: process.env.DB_USERNAME,
       password: process.env.DB_PASSWORD,
       database: process.env.DB_NAME,
+      // Entities
       entities: [__dirname + "/**/*.entity{.ts,.js}"],
-      synchronize: true,
-      logging: ["error", "warn", "query"],
-      maxQueryExecutionTime: 1000,
+      // Auto sync (disable in production if possible)
+      synchronize: process.env.NODE_ENV !== "production",
+      // Connection pooling - CRITICAL FOR PERFORMANCE
+      poolSize: 20,
+      maxQueryExecutionTime: 60000, // 60 seconds timeout
+      connectTimeout: 10000,
+      // Query optimization
+      cache: {
+        type: "database",
+        duration: 300000, // 5 minutes cache
+      },
+      // Logging - disable for production
+      logging: process.env.NODE_ENV !== "production" ? ["error", "warn"] : false,
+      // Required for TiDB Cloud / secure MySQL connections
+      ssl: { rejectUnauthorized: false },
+      extra: {
+        ssl: { rejectUnauthorized: false },
+      },
+      // Retry configuration
+      retryAttempts: 10,
+      retryDelay: 3000,
     }),
+
+    // TypeOrmModule.forRoot({
+    //   type: "mysql",
+    //   host: process.env.DB_HOST,
+    //   port: parseInt(process.env.DB_PORT, 10),
+    //   username: process.env.DB_USERNAME,
+    //   password: process.env.DB_PASSWORD,
+    //   database: process.env.DB_NAME,
+    //   entities: [__dirname + "/**/*.entity{.ts,.js}"],
+    //   synchronize: true,
+    //   logging: ["error", "warn", "query"],
+    //   maxQueryExecutionTime: 1000,
+    // }),
     MailerModule.forRoot({
       transport: {
         host: "smtp.yandex.com",
