@@ -12,11 +12,13 @@ import { ApiBody, ApiTags } from "@nestjs/swagger";
 import { BrandInfoDTO } from "./entity/brandinfo.dto";
 import { BrandInfoService } from "./brandinfo.service";
 import { AuthGuard } from '../auth/guards/auth.gaurd';
+import { OptionalAuthGuard } from '../auth/guards/optional-auth.guard';
 import { PermissionGuard } from '../auth/guards/permission.guard';
 import { Permission } from '../auth/decorators/permission.decorator';
 
 @ApiTags("Brand Info")
 @Controller("brandinfo")
+@UseGuards(OptionalAuthGuard, PermissionGuard)
 export class BrandInfoController {
   constructor(public brandinfoService: BrandInfoService) {}
 

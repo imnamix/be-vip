@@ -15,11 +15,13 @@ import { ApiBody, ApiTags } from "@nestjs/swagger";
 import { VideoTestimonialDTO } from "./entity/video-testimonial.dto";
 import { VideoTestimonialsService } from "./video-testimonials.service";
 import { AuthGuard } from '../auth/guards/auth.gaurd';
+import { OptionalAuthGuard } from '../auth/guards/optional-auth.guard';
 import { PermissionGuard } from '../auth/guards/permission.guard';
 import { Permission } from '../auth/decorators/permission.decorator';
 
 @ApiTags("Video Testimonials")
 @Controller("video-testimonials")
+@UseGuards(OptionalAuthGuard, PermissionGuard)
 export class VideoTestimonialsController {
   constructor(private readonly svc: VideoTestimonialsService) {}
 

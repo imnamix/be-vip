@@ -15,11 +15,13 @@ import { ApiBody, ApiQuery, ApiTags } from "@nestjs/swagger";
 import { ContactService } from "./contact.service";
 import { ContactDTO, DeleteContactDTO } from "./entity/contact.dto";
 import { AuthGuard } from '../auth/guards/auth.gaurd';
+import { OptionalAuthGuard } from '../auth/guards/optional-auth.guard';
 import { PermissionGuard } from '../auth/guards/permission.guard';
 import { Permission } from '../auth/decorators/permission.decorator';
 
 @ApiTags("Contact")
 @Controller("contact")
+@UseGuards(OptionalAuthGuard, PermissionGuard)
 export class ContactController {
   constructor(private readonly contactService: ContactService) {}
 

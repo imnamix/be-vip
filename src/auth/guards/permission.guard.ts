@@ -66,10 +66,13 @@ export class PermissionGuard implements CanActivate {
     }
 
     if (requirement && !result.allowed) {
+      const moduleLabel = Array.isArray(requirement.module)
+        ? requirement.module.join("' or '")
+        : requirement.module;
       throw new HttpException(
         {
           code: 'FORBIDDEN',
-          message: `You do not have '${requirement.action}' access to '${requirement.module}'.`,
+          message: `You do not have '${requirement.action}' access to '${moduleLabel}'.`,
         },
         HttpStatus.FORBIDDEN, // 403
       );

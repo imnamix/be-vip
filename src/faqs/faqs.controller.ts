@@ -15,11 +15,13 @@ import { ApiBody, ApiTags } from "@nestjs/swagger";
 import { FaqDTO } from "./entity/faq.dto";
 import { FaqsService } from "./faqs.service";
 import { AuthGuard } from '../auth/guards/auth.gaurd';
+import { OptionalAuthGuard } from '../auth/guards/optional-auth.guard';
 import { PermissionGuard } from '../auth/guards/permission.guard';
 import { Permission } from '../auth/decorators/permission.decorator';
 
 @ApiTags("FAQs")
 @Controller("faqs")
+@UseGuards(OptionalAuthGuard, PermissionGuard)
 export class FaqsController {
   constructor(private readonly svc: FaqsService) {}
 

@@ -5,6 +5,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { JwtStrategy } from './jwt.strategy';
 import { AuthGuard } from './guards/auth.gaurd';
+import { OptionalAuthGuard } from './guards/optional-auth.guard';
 import { PermissionGuard } from './guards/permission.guard';
 import { PermissionService } from './services/permission.service';
 import { EN_User } from '../user/entity/user.entity';
@@ -22,11 +23,12 @@ import { EN_AdminRole } from '../roles/entity/role.entity';
     }),
     TypeOrmModule.forFeature([EN_User, EN_AdminRole]),
   ],
-  providers: [JwtStrategy, AuthGuard, PermissionGuard, PermissionService],
+  providers: [JwtStrategy, AuthGuard, OptionalAuthGuard, PermissionGuard, PermissionService],
   exports: [
     PassportModule,
     JwtModule,
     AuthGuard,
+    OptionalAuthGuard,
     PermissionGuard,
     PermissionService,
   ],

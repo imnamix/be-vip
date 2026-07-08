@@ -17,11 +17,13 @@ import { EventsDTO, DeleteEventDTO } from './entity/events.dto';
 import { EventsService } from './events.service';
 import { EN_Events } from './entity/events.entity';
 import { AuthGuard } from '../auth/guards/auth.gaurd';
+import { OptionalAuthGuard } from '../auth/guards/optional-auth.guard';
 import { PermissionGuard } from '../auth/guards/permission.guard';
 import { Permission } from '../auth/decorators/permission.decorator';
 
 @ApiTags('Events')
 @Controller('events')
+@UseGuards(OptionalAuthGuard, PermissionGuard)
 export class EventsController {
   constructor(public eventsService: EventsService) {}
 

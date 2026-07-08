@@ -7,11 +7,13 @@ import { ApiBody, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { VipNumbersDTO } from './entity/vip-numbers.dto';
 import { VipNumbersService } from './vip-numbers.service';
 import { AuthGuard } from '../auth/guards/auth.gaurd';
+import { OptionalAuthGuard } from '../auth/guards/optional-auth.guard';
 import { PermissionGuard } from '../auth/guards/permission.guard';
 import { Permission } from '../auth/decorators/permission.decorator';
 
 @ApiTags('VIP Numbers')
 @Controller('vip-numbers')
+@UseGuards(OptionalAuthGuard, PermissionGuard)
 export class VipNumbersController {
   constructor(private readonly svc: VipNumbersService) {}
 

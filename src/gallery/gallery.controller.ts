@@ -15,11 +15,13 @@ import { ApiBody, ApiTags } from "@nestjs/swagger";
 import { GalleryDTO } from "./entity/gallery.dto";
 import { GalleryService } from "./gallery.service";
 import { AuthGuard } from '../auth/guards/auth.gaurd';
+import { OptionalAuthGuard } from '../auth/guards/optional-auth.guard';
 import { PermissionGuard } from '../auth/guards/permission.guard';
 import { Permission } from '../auth/decorators/permission.decorator';
 
 @ApiTags("Gallery")
 @Controller("gallery")
+@UseGuards(OptionalAuthGuard, PermissionGuard)
 export class GalleryController {
   constructor(public galleryService: GalleryService) {}
 

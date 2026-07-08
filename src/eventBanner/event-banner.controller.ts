@@ -3,11 +3,13 @@ import { ApiBody, ApiTags } from '@nestjs/swagger';
 import { EventBannerDTO } from './entity/event-banner.dto';
 import { EventBannerService } from './event-banner.service';
 import { AuthGuard } from '../auth/guards/auth.gaurd';
+import { OptionalAuthGuard } from '../auth/guards/optional-auth.guard';
 import { PermissionGuard } from '../auth/guards/permission.guard';
 import { Permission } from '../auth/decorators/permission.decorator';
 
 @ApiTags("Event Banner")
 @Controller("event-banner")
+@UseGuards(OptionalAuthGuard, PermissionGuard)
 export class EventBannerController {
   constructor(private readonly svc: EventBannerService) {}
 

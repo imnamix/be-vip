@@ -39,9 +39,11 @@ export class EnquiryController {
     }
   }
 
+  // Read is shared with the Delivery page, which tracks the same enquiry
+  // records under its own "Delivery" permission — either grants access.
   @Get('allEnquiries')
   @UseGuards(AuthGuard, PermissionGuard)
-  @Permission('Inquiry', 'read')
+  @Permission(['Inquiry', 'Delivery'], 'read')
   @ApiQuery({ name: 'page',      required: false, type: Number })
   @ApiQuery({ name: 'limit',     required: false, type: Number })
   @ApiQuery({ name: 'search',    required: false, type: String })
@@ -74,7 +76,7 @@ export class EnquiryController {
 
   @Get('statusCounts')
   @UseGuards(AuthGuard, PermissionGuard)
-  @Permission('Inquiry', 'read')
+  @Permission(['Inquiry', 'Delivery'], 'read')
   async getStatusCounts() {
     try {
       return await this.enquiryService.getStatusCounts();
@@ -103,7 +105,7 @@ export class EnquiryController {
 
   @Patch('update/:id')
   @UseGuards(AuthGuard, PermissionGuard)
-  @Permission('Inquiry', 'update')
+  @Permission(['Inquiry', 'Delivery'], 'update')
   @ApiBody({ type: EnquiryDTO })
   async update(@Param('id') id: number, @Body() payload: Partial<EnquiryDTO>) {
     try {

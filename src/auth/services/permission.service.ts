@@ -24,7 +24,8 @@ export class PermissionService {
    * Single method that covers every backend RBAC check:
    *  1. User existence
    *  2. User status (ACCOUNT_DISABLED)
-   *  3. Permission version comparison (returns PERMISSION_UPDATED when stale)
+   *  3. Permission version comparison (returns PERMISSION_UPDATED when stale) —
+   *     runs on every guarded call regardless of module/action
    *  4. Specific module+action permission check
    *
    * Pass module/action as null for auth-only routes (status check only).
@@ -33,7 +34,7 @@ export class PermissionService {
     userId: number,
     roleId: number | null,
     clientVersion: string | undefined,
-    module: string | null,
+    module: string | string[] | null,
     action: PermissionAction | null,
   ): Promise<PermissionCheckResult> {
     const [user, role] = await Promise.all([
@@ -54,14 +55,12 @@ export class PermissionService {
       return { allowed: false, userStatus: 'ACCOUNT_DISABLED' };
     }
 
-    // Auth-only route — no module/action to check
-    if (!module || !action) {
-      return { allowed: true };
-    }
-
     const freshVersion = role?.updated_at?.toISOString() ?? null;
 
-    // Client has a cached version that no longer matches the DB
+    // Client has a cached version that no longer matches the DB. Checked on
+    // every guarded call (not just permission-decorated ones) so any API
+    // call the client makes — not a background poll — is what refreshes an
+    // already-logged-in user's stale permissions.
     if (clientVersion && freshVersion && clientVersion !== freshVersion) {
       return {
         allowed: false,
@@ -71,8 +70,14 @@ export class PermissionService {
       };
     }
 
+    // Auth-only route — no module/action to check
+    if (!module || !action || (Array.isArray(module) && module.length === 0)) {
+      return { allowed: true };
+    }
+
     const permissions: PermissionsMap = (role?.permissions ?? {}) as PermissionsMap;
-    const hasPermission = permissions[module]?.[action] === true;
+    const modules = Array.isArray(module) ? module : [module];
+    const hasPermission = modules.some(m => permissions[m]?.[action] === true);
 
     return { allowed: hasPermission };
   }

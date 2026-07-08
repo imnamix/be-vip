@@ -16,11 +16,13 @@ import { HomePageDTO } from "./entity/homepage.dto";
 import { HomePageService } from "./homepage.service";
 import { DeleteHomeDTO } from "./entity/deleteHome.dto";
 import { AuthGuard } from '../auth/guards/auth.gaurd';
+import { OptionalAuthGuard } from '../auth/guards/optional-auth.guard';
 import { PermissionGuard } from '../auth/guards/permission.guard';
 import { Permission } from '../auth/decorators/permission.decorator';
 
 @ApiTags("Home Page")
 @Controller("homePage")
+@UseGuards(OptionalAuthGuard, PermissionGuard)
 export class HomePageController {
   constructor(public homePageService: HomePageService) {}
 

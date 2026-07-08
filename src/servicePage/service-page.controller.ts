@@ -3,11 +3,13 @@ import { ApiBody, ApiTags } from "@nestjs/swagger";
 import { ServicePageDTO } from "./entity/service-page.dto";
 import { ServicePageService } from "./service-page.service";
 import { AuthGuard } from '../auth/guards/auth.gaurd';
+import { OptionalAuthGuard } from '../auth/guards/optional-auth.guard';
 import { PermissionGuard } from '../auth/guards/permission.guard';
 import { Permission } from '../auth/decorators/permission.decorator';
 
 @ApiTags("Service Page")
 @Controller("service-page")
+@UseGuards(OptionalAuthGuard, PermissionGuard)
 export class ServicePageController {
   constructor(private readonly svc: ServicePageService) {}
 

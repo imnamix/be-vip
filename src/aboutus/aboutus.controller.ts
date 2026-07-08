@@ -17,11 +17,13 @@ import { AboutUsService } from "./aboutus.service";
 import { DeleteAboutDTO } from "./entity/deleteAbout.dto";
 import { EN_AboutUs } from "./entity/aboutus.entity";
 import { AuthGuard } from '../auth/guards/auth.gaurd';
+import { OptionalAuthGuard } from '../auth/guards/optional-auth.guard';
 import { PermissionGuard } from '../auth/guards/permission.guard';
 import { Permission } from '../auth/decorators/permission.decorator';
 
 @ApiTags("About Us")
 @Controller("aboutus")
+@UseGuards(OptionalAuthGuard, PermissionGuard)
 export class AboutusController {
   constructor(public aboutusService: AboutUsService) {}
 
